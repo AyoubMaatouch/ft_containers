@@ -4,8 +4,5 @@
 namespace ft
 {
 
-    class Vector
-    {
-        
-    }
+   
 }
