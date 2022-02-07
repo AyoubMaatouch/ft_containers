@@ -6,6 +6,11 @@ namespace ft
 
     class Vector
     {
+        public:
+        protected:
+
+        private:
+
         
     }
 }
