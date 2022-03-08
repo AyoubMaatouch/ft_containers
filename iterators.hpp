@@ -22,55 +22,36 @@ std::vector<int *>::iterator *it;
 namespace ft
 {
 
-    // i think this not as important
-    template <class Category, class T, class Distance = ptrdiff_t, // ptrdiff_t is sigend and size_t not
-      class Pointer = T *, class Reference = T &>
-    struct iterBase
-    {
-            typedef T value_type;
-            typedef Distance difference_type;
-            typedef Pointer pointer;
-            typedef Reference reference;
-            typedef Category iterator_category;
-    };
-
     template <class T>
-    class _Iterator : public iterBase<std::random_access_iterator_tag, T>
+    class _Iterator //: public iterBase<std::random_access_iterator_tag, T>
     {
 
     public:
-        typedef T                               value_type;
-        typedef ptrdiff_t                          difference_type; //ptrdiff_t is sigend and size_t not
-        typedef T*                              pointer;
-        typedef T&                              reference;
-        typedef Category iterator_category;
+        typedef     T                               value_type;
+        typedef     ptrdiff_t                       difference_type; //ptrdiff_t is sigend and size_t not
+        typedef     T&                                  reference;
+        typedef     T*                                  pointer;
+        typedef     std::random_access_iterator_tag     iterator_category;
 
-        _Iterator(): _ptrBaseBase() {}
+        _Iterator(): _ptrBase() {}
         
         _Iterator(pointer p)
         {
-            std::cout << "iterator destractor called" << std::endl;
-        }
             _ptrBase = p;
-        ~_Iterator() { std::cout << "iterator destractor called" << std::endl; }
+        }
+        ~_Iterator() {}
 
         _Iterator(_Iterator const &src)
         {
             _ptrBase = src._ptrBase;
-            return;
         }
-        _Iterator(_Iterator const &src)
-        {
-            _ptrBase = src._ptrBase;
-        }
-
+   
         // operator OverLoad
         _Iterator& operator=(_Iterator const &src)
         {
             _ptrBase = src._ptrBase;
             return (*this);
         }
-
         //pre
         _Iterator& operator++(void)
         {
@@ -82,8 +63,9 @@ namespace ft
             this->_ptrBase--;
             return (*this);
         }
+        
         //post
-        _Iterator& operator++(int)
+        _Iterator operator++(int)
         {
             _Iterator tmp(*this);
             this->_ptrBase++; 
@@ -98,52 +80,74 @@ namespace ft
         
         //Comparisions Operators : “==”, “!=”, “>”, “<”, “>=”,  “<=”
         
-        bool operator==(_Iterator const *src)
+        bool operator==(_Iterator const &src)
         {
-            return ((this->_ptrBase) == src->_ptrBase);
+            return ((this->_ptrBase) == src._ptrBase);
         }
-        bool operator!=(_Iterator const *src)
+        bool operator!=(_Iterator const &src)
         {
-            return ((this->_ptrBase) != src->_ptrBase);
+            return ((this->_ptrBase) != src._ptrBase);
         }
-        bool operator>(_Iterator const *src)
+        bool operator>(_Iterator const &src)
         {
-            return ((this->_ptrBase) > src->_ptrBase);
+            return ((this->_ptrBase) > src._ptrBase);
         }
-        bool operator <(_Iterator const *src)
+        bool operator <(_Iterator const &src)
         {
-            return ((this->_ptrBase) < src->_ptrBase);
+            return ((this->_ptrBase) < src._ptrBase);
         }
-        bool operator <=(_Iterator const *src)
+        bool operator <=(_Iterator const &src)
         {
-            return ((this->_ptrBase) <= src->_ptrBase);
+            return ((this->_ptrBase) <= src._ptrBase);
         }
-        bool operator >=(_Iterator const *src)
+        bool operator >=(_Iterator const &src)
         {
-            return ((this->_ptrBase) >= src->_ptrBase);
+            return ((this->_ptrBase) >= src._ptrBase);
         }
 
-        //arithmetic operators (+, +=, -=, -)
-        _Iterator operator+(const _Iterator& s1, const _Iterator& s2)
+        //arithmetic operators (+, +=, -=, -, [])
+        _Iterator operator+(difference_type index)
         {
-            return (s1._ptrBase + s2._ptrBase);
+            return (_Iterator(_ptrBase + index));
         }
-        _Iterator operator+=(const _Iterator& s1, const _Iterator& s2)
+        void operator+=(difference_type index)
         {
-            return (s1._ptrBase + s2._ptrBase);
+            this->_ptrBase + index;
         }
-        _Iterator operator-=(const _Iterator& s1, const _Iterator& s2)
+        void operator-=(difference_type index)
         {
-            return (s1._ptrBase - s2._ptrBase);
+            this->_ptrBase - index;
         }
-        _Iterator operator-(const _Iterator& s1, const _Iterator& s2)
-        {
-            return (s1._ptrBase - s2._ptrBase);
+        _Iterator operator-(difference_type index)
+        { 
+            return (_Iterator(_ptrBase - index));
         }
+        
+        _Iterator operator-(_Iterator const &sr)
+        { 
+            return (_Iterator(this->_ptrBase - sr._ptrBase));
+        }
+        reference operator[](difference_type index)
+        { 
+            return (this->_ptrBase[index]);
+        }
+        pointer operator->()
+        { 
+            return ((this->_ptrBase));
+        }
+        reference operator*()
+        { 
+            return (*(this->_ptrBase));
+        }
+        
 
     private:
         pointer _ptrBase;
     };
 
-
+template <class T>
+_Iterator<T> operator+(ptrdiff_t index, _Iterator<T> sr)
+        {
+            return (_Iterator<T>(sr._ptrBase + index));
+        }
 }
