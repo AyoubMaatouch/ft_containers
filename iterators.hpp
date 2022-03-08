@@ -1,19 +1,4 @@
-//! The below iterators (Base random_access_iterator and iterator_traits) are not mandatory, but needed in the subject
-//* The base class for all the iterators.
-
-// template <class Category, class T, class Distance = ptrdiff_t,
-//           class Pointer = T*, class Reference = T&>
-//   struct iteratorBase {
-//     typedef T         value_type;
-//     typedef Distance  difference_type;
-//     typedef Pointer   pointer;
-//     typedef Reference reference;
-//     typedef Category  iterator_category;
-//   };
-
-// template <class Category, class T, class Distance = ptrdiff_t,
-//           class Pointer = T*, class Reference = T&>
-
+#pragma once
 #include <iostream>
 #include <vector>
 
@@ -71,7 +56,7 @@ namespace ft
             this->_ptrBase++; 
             return tmp;
         }
-        _Iterator& operator--(int)
+        _Iterator operator--(int)
         {
             _Iterator tmp(*this);
             this->_ptrBase--; 
@@ -108,6 +93,7 @@ namespace ft
         //arithmetic operators (+, +=, -=, -, [])
         _Iterator operator+(difference_type index)
         {
+// return value calles constructor so noo need to call it again
             return (_Iterator(_ptrBase + index));
         }
         void operator+=(difference_type index)
@@ -120,7 +106,7 @@ namespace ft
         }
         _Iterator operator-(difference_type index)
         { 
-            return (_Iterator(_ptrBase - index));
+            return (_ptrBase - index);
         }
         
         _Iterator operator-(_Iterator const &sr)
@@ -140,7 +126,6 @@ namespace ft
             return (*(this->_ptrBase));
         }
         
-
     private:
         pointer _ptrBase;
     };

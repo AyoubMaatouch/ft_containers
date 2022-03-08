@@ -10,11 +10,13 @@ int main()
 
     ft::_Iterator<int> be(vec);
     
-    ft::_Iterator<int> ne(be);
+    ft::_Iterator<int> ne = be;
     
-    if (be == ne)
+    if (be <= ne)
         std::cout << "the same as you\n"; 
     std::cout << *(be) << std::endl;
     be = be + 5;
-    std::cout << *(be) << std::endl;
+    ne = be - 3;
+    
+    std::cout << *(ne) << std::endl;
 }
