@@ -257,9 +257,9 @@ namespace ft
 		pointer _revptr;
 	};
 	template <class T>
-	_Iterator<T> operator+(ptrdiff_t index, _revIterator<T> sr)
+	_revIterator<T> operator+(ptrdiff_t index, _revIterator<T> sr)
 	{
-		return (_Iterator<T>(sr._ptrBase - index));
+		return (_revIterator<T>(sr._revptr - index));
 	}
 	
 }
