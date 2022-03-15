@@ -20,4 +20,13 @@ int main()
     // std::cout << *(be) << std::endl;
     // be = be + 5;
     // std::cout << *(be) << std::endl;
+    ft::_Iterator<int> ne = be;
+    
+    if (be <= ne)
+        std::cout << "the same as you\n"; 
+    std::cout << *(be) << std::endl;
+    be = be + 5;
+    ne = be - 3;
+    
+    std::cout << *(ne) << std::endl;
 }
