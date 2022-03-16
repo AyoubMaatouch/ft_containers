@@ -18,11 +18,11 @@ namespace ft
 	};
 
 	template <class T>
-	class Iterator : public iterator<typename ft::iterator_traits<T>::iterator_category,
-									 typename ft::iterator_traits<T>::value_type,
-									 typename ft::iterator_traits<T>::difference_type,
-									 typename ft::iterator_traits<T>::pointer,
-									 typename ft::iterator_traits<T>::reference>
+	class Iterator : public iterator<typename iterator_traits<T>::iterator_category,
+									 typename iterator_traits<T>::value_type,
+									 typename iterator_traits<T>::difference_type,
+									 typename iterator_traits<T>::pointer,
+									 typename iterator_traits<T>::reference>
 	{
 	public:
 		typedef typename ft::iterator_traits<T>::value_type value_type;
@@ -33,18 +33,18 @@ namespace ft
 
 		Iterator() : _ptrBase() {}
 
-		explicit Iterator(pointer p)
+		Iterator(pointer p)
 		{
 			_ptrBase = p;
 		}
-		~Iterator() {}
+		
+		pointer base() const { return _ptrBase; }
 
 		Iterator(Iterator const &src)
 		{
 			_ptrBase = src._ptrBase;
 		}
-
-		// operator OverLoad
+		// operator overLoad
 		Iterator &operator=(Iterator const &src)
 		{
 			_ptrBase = src._ptrBase;
