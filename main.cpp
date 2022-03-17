@@ -1,32 +1,42 @@
-#include <vector>
-#include <iostream>
-#include "iterators.hpp"
+// #include <vector>
 
+
+#include "vector.hpp"
+#include "iterators.hpp"
+// C++ program for illustration
+// of std::allocator() function
+#include <iostream>
+#include <memory>
+#include <vector>
+using namespace std;
 int main()
 {
-    int *vec = new int(10) ;
-    for (int i = 0; i < 10; i++)
-        vec[i]= i + 10;
+  
+    // allocator for integer values
+    // allocator<int> myAllocator;
+  
+    // allocate space for five ints
+    // ::ft::vector<int*> here(5, 100);
+    ft::vector<int> hego;
+    ft::vector<int>::iterator it = hego.begin();
+    std::cout << (*it) << std::endl;
+    
+    
+    // int* arr = myAllocator.allocate(5);
+  
+    // // construct arr[0] and arr[3]
+    // for (int i = 0 ; i < 4; i++)
+    //     myAllocator.construct(arr + i, 100);
 
-    ft::Iterator<int*> be(vec);
-    
-    ft::Iterator<int*> ne(be);
-    std::vector<int> bg(10,50);
-    std::vector<int>::iterator nb = bg.begin();
-    std::cout << *nb << std::endl;
-
-    // if (be == ne)
-    //     std::cout << "the same as you\n"; 
-    // std::cout << *(be) << std::endl;
-    // be = be + 5;
-    // std::cout << *(be) << std::endl;
-    ft::Iterator<int> ne = be;
-    
-    if (be <= ne)
-        std::cout << "the same as you\n"; 
-    std::cout << *(be) << std::endl;
-    be = be + 5;
-    ne = be - 3;
-    
-    std::cout << *(ne) << std::endl;
+  
+    // cout << arr[3] << endl;
+    // cout << arr[4] << endl;
+    // cout << arr[0] << endl;
+    // cout << arr[1] << endl;
+    // cout << arr[2] << endl;
+  
+    // deallocate space for five ints
+    // myAllocator.deallocate(arr, 5);
+  
+    return 0;
 }
