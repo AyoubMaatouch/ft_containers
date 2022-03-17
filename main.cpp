@@ -17,8 +17,10 @@ int main()
   
     // allocate space for five ints
     // ::ft::vector<int*> here(5, 100);
-    ft::vector<int> hego;
+    ft::vector<int> hego(100, 10);
     ft::vector<int>::iterator it = hego.begin();
+    std::cout << (*it) << std::endl;
+    it++;
     std::cout << (*it) << std::endl;
     
     

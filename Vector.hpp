@@ -23,24 +23,23 @@ namespace ft
 		   private :
 		   	pointer 		_buffer;
 			allocator_type _allocater;
+			size_type _size;
+			size_type _capacity;
 
 		// construct/copy/destroy:
 		public:
-		explicit vector(const Allocator& alloc = Allocator()): _buffer()
+		explicit vector(const Allocator& alloc = Allocator()): _buffer(), _size(), _capacity()
 		{
 			_allocater = alloc;
-			_buffer = _allocater.allocate(5);
-				for (size_type i = 0; i < 5 ; i++)
-					_allocater.construct((_buffer + i), 100);
 		}
-		// explicit vector(size_type n, const T& value = T(),
-        //     const Allocator& alloc = Allocator())
-		// 	{
-		// 		_allocater = alloc ;
-		// 		_buffer = _allocater.allocate(n);
-		// 		for (size_type i = 0; i < n ; i++)
-		// 			myAllocator.construct((_buffer + i), value);
-		// 	}
+		explicit vector(size_type n, const T& value = T(),
+            const Allocator& alloc = Allocator())
+			{
+				_allocater = alloc ;
+				_buffer = _allocater.allocate(n);
+				for (size_type i = 0; i < n ; i++)
+					_allocater.construct((_buffer + i), value);
+			}
 		iterator begin()
 		{
 			return iterator(_buffer);
