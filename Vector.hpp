@@ -36,6 +36,8 @@ namespace ft
             const Allocator& alloc = Allocator())
 			{
 				_allocater = alloc ;
+				_size = n;
+				_capacity = n;
 				_buffer = _allocater.allocate(n);
 				for (size_type i = 0; i < n ; i++)
 					_allocater.construct((_buffer + i), value);

@@ -1,10 +1,5 @@
-// #include <vector>
-
-
 #include "vector.hpp"
 #include "iterators.hpp"
-// C++ program for illustration
-// of std::allocator() function
 #include <iostream>
 #include <memory>
 #include <vector>
