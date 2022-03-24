@@ -6,17 +6,20 @@
 using namespace std;
 int main()
 {
-  
+    int x;
+    int *v = new int();
+    std::cout << x <<" "<<*v << std::endl;
     // allocator for integer values
     // allocator<int> myAllocator;
   
     // allocate space for five ints
     // ::ft::vector<int*> here(5, 100);
-    ft::vector<int> hego(100, 10);
-    ft::vector<int>::iterator it = hego.begin();
-    std::cout << (*it) << std::endl;
-    it++;
-    std::cout << (*it) << std::endl;
+    // std::vector<int> hego(10, 10);
+    // std::vector<int>::iterator it = hego.begin();
+    // std::vector<int>::iterator en = hego.end();
+    
+    // for (; it != en; it++)
+    //     std::cout << &it <<" - "<<(*it) << std::endl;
     
     
     // int* arr = myAllocator.allocate(5);

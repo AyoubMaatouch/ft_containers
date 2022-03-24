@@ -22,9 +22,9 @@ namespace ft
 
 		   private :
 		   	pointer 		_buffer;
-			allocator_type _allocater;
-			size_type _size;
-			size_type _capacity;
+			allocator_type	_allocater;
+			size_type 		_size;
+			size_type		_capacity;
 
 		// construct/copy/destroy:
 		public:
@@ -33,11 +33,8 @@ namespace ft
 			_allocater = alloc;
 		}
 		explicit vector(size_type n, const T& value = T(),
-            const Allocator& alloc = Allocator())
+            const Allocator& alloc = Allocator()): _allocater(alloc), _size(n), _capacity(n)
 			{
-				_allocater = alloc ;
-				_size = n;
-				_capacity = n;
 				_buffer = _allocater.allocate(n);
 				for (size_type i = 0; i < n ; i++)
 					_allocater.construct((_buffer + i), value);
@@ -46,11 +43,15 @@ namespace ft
 		{
 			return iterator(_buffer);
 		}
-/***
+		iterator end()
+		{
+			return iterator((_buffer  + (_size )));
+		}
+
         template <class InputIterator>
           vector(InputIterator first, InputIterator last,
             const Allocator& = Allocator());
-
+/***
         vector(const vector<T,Allocator>& x);
 
        ~vector();
@@ -63,7 +64,6 @@ namespace ft
 		// iterators:
 		iterator begin(); 
 		const_iterator begin()const; 
-		iterator end(); 
 		const_iterator end()const; 
 		reverse_iterator rbegin(); 
 		const_reverse_iterator rbegin() const; 
