@@ -1,14 +1,18 @@
-#include "vector.hpp"
-#include "iterators.hpp"
+// #include "vector.hpp"
+// #include "iterators.hpp"
 #include <iostream>
-#include <memory>
-#include <vector>
-using namespace std;
-int main()
-{
-    int x;
-    int *v = new int();
-    std::cout << x <<" "<<*v << std::endl;
+// #include <memory>
+// #include <vector>
+// using namespace std;
+#include "is_intergal.hpp"
+
+    int main() {
+    std::cout << std::boolalpha;
+    std::cout << "is_integral:" << std::endl;
+    std::cout << "char: " << (bool)is_integral<char>::value << std::endl;
+    std::cout << "int: " << (bool)is_integral<int>::value << std::endl;
+    std::cout << "float: " << is_integral<float>::value << std::endl;
+ 
     // allocator for integer values
     // allocator<int> myAllocator;
   
