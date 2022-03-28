@@ -41,17 +41,15 @@ namespace ft
 				for (size_type i = 0; i < n ; i++)
 					_allocater.construct((_buffer + i), value);
 			}
-        // template <class InputIterator>
-        //   vector(InputIterator first, InputIterator last,
-        //     const Allocator& alloc = Allocator(), typename enable_if<!ft::is_integral<InputIterator>::value, bool>::type = false)
-		// 	{
-
-		// 	}
-
-
-
-	
-
+        template <class InputIterator>
+          vector(InputIterator first, InputIterator last,
+            const Allocator& alloc = Allocator(), typename enable_if<!is_integral<InputIterator>::value, bool>::type = false) 
+			{
+				_allocater = alloc;
+				_size = _capacity = std::distance(first, last);
+				_buffer = _allocater.allocate(_capacity);
+				std::copy(first, last, begin());
+			}
        ~vector()
 	   {
 		   while(_size)
@@ -66,12 +64,31 @@ namespace ft
 
         vector<T,Allocator>& operator=(const vector<T,Allocator>& x)
 		{
-			this->vector<T,Allocator>(x);
+			// clear();
+			reserve(x.capacity());
+			_size = x.size();
+			std::copy(x.begin(), x.end(), begin());
+			return (*this);
+		}
+        void assign(size_type n, const T& u)
+		{
+			if (n < _capacity)
+				{
+					clear();
+					_size = n;
+					std::fill(begin(), end(), u);
+				}
+			else
+				{
+					this->~vector();
+					_buffer = _allocater.allocate(n);
+					_size = _capacity = n;
+					std::fill(begin(), end(), u);
+				}
 		}
 /***
         template <class InputIterator>
           void assign(InputIterator first, InputIterator last);
-        void assign(size_type n, const T& u);
 	***/
         allocator_type get_allocator() const { return _allocater; }
 

@@ -73,9 +73,9 @@ namespace ft
 			return (Iterator(_ptrBase - index));
 		}
 
-		Iterator operator-(Iterator const &sr)
+		difference_type operator-(const Iterator  &sr)
 		{
-			return (Iterator(this->_ptrBase - sr._ptrBase));
+			return this->_ptrBase - sr._ptrBase;
 		}
 		reference operator[](difference_type index)
 		{
