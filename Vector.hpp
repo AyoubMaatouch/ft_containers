@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
-
+#include <iostream>
+#include <algorithm>
 #include "iterators.hpp"
 #include "enable_if.hpp"
 #include "is_intergal.hpp"
@@ -32,7 +33,7 @@ namespace ft
 
 		// construct/copy/destroy:
 		public:
-		explicit vector(const Allocator& alloc = Allocator()): _buffer(), _size(), _capacity(). _allocater(alloc) {}
+		explicit vector(const Allocator& alloc = Allocator()): _buffer(), _size(), _capacity(), _allocater(alloc) {}
 		explicit vector(size_type n, const T& value = T(),
             const Allocator& alloc = Allocator()): _allocater(alloc), _size(n), _capacity(n)
 			{
@@ -53,12 +54,21 @@ namespace ft
 
        ~vector()
 	   {
+		   while(_size)
+				pop_back();
 		   _allocater.deallocate(_buffer, _capacity);
 	   }
-/***
-        vector(const vector<T,Allocator>& x);
+        vector(const vector<T,Allocator>& x) : _capacity(x.size()), _size(x.size()), _allocater(x.get_allocator())
+		{
+			_buffer = _allocater.allocate(_size);
+			std::copy(x.begin(), x.end(), begin());
+		}
 
-        vector<T,Allocator>& operator=(const vector<T,Allocator>& x);
+        vector<T,Allocator>& operator=(const vector<T,Allocator>& x)
+		{
+			this->vector<T,Allocator>(x);
+		}
+/***
         template <class InputIterator>
           void assign(InputIterator first, InputIterator last);
         void assign(size_type n, const T& u);
@@ -104,17 +114,21 @@ namespace ft
 		{
 			if (sz > _capacity)
 			{
-				(_capacity * 2) <= sz ? reserve(_capacity * 2) : reserve(sz) ;
+				(_capacity * 2) >= sz ? reserve(_capacity * 2) : reserve(sz) ;
+
 				for (; _size < _capacity; _size++)
-					_allocator.construct(_buffer + _size, val);
+					_allocater.construct(_buffer + _size, c);
 			}
 			else
 				{
 					if (sz > _size)
 					{
-						// here implement 
+						for (; _size < sz; _size++)
+							_allocater.construct(_buffer + _size, c); 
 					}
-
+					else
+						while (sz < _size)
+							pop_back();
 				}
 		}
 
@@ -144,16 +158,14 @@ namespace ft
 		
 		// modifiers:
 
-		void push_back(const value_type &val) {
-			 resize(_size + 1, val); 
-			 }
-		void pop_back() {
+		void push_back(const value_type &val) { resize(_size + 1, val);  }
+		void pop_back() { _allocater.destroy(_buffer + _size); 
 			 --_size;
-			 _allocater.destroy(_buffer + _size); 
 			 }
 		/***
 		iterator insert(iterator position, const T& x);
-		void insert(iterator position, size_type n, const T& x); template <class InputIterator>
+		void insert(iterator position, size_type n, const T& x); 
+		template <class InputIterator>
         void insert(iterator position,
                         InputIterator first, InputIterator last);
         iterator erase(iterator position);
@@ -166,4 +178,25 @@ namespace ft
 				_allocater.destroy((_buffer + _size));
 		}           
 		};
+	// template <class T, class Allocator>
+	// bool operator==(const vector<T,Allocator>& x,
+	// const vector<T,Allocator>& y);
+	// template <class T, class Allocator>
+	// bool operator< (const vector<T,Allocator>& x,
+	// const vector<T,Allocator>& y);
+	// template <class T, class Allocator>
+	// bool operator!=(const vector<T,Allocator>& x,
+	// const vector<T,Allocator>& y);
+	// template <class T, class Allocator>
+	// bool operator> (const vector<T,Allocator>& x,
+	// const vector<T,Allocator>& y);
+	// template <class T, class Allocator>
+	// bool operator>=(const vector<T,Allocator>& x,
+	// const vector<T,Allocator>& y);
+	// template <class T, class Allocator>
+	// bool operator<=(const vector<T,Allocator>& x,
+	// const vector<T,Allocator>& y);
+	/**specialized algorithms:***/
+	// template <class T, class Allocator>
+	// void swap(vector<T,Allocator>& x, vector<T,Allocator>& y);
 }
