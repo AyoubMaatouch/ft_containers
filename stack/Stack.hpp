@@ -1,16 +1,11 @@
 #pragma once
-#include <iostream>
 
 namespace ft
 {
 
-    class Vector
+    class stack
     {
-        public:
-        protected:
-
-        private:
-
+     
         
-    }
+    };
 }
