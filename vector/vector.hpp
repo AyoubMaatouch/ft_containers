@@ -100,8 +100,27 @@ namespace ft
 				typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::bidirectional_iterator_tag()) ||
 				typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::forward_iterator_tag()))
 			{
-				erase(begin(), end()); // needs to be done
-				insert(begin(), first, last);
+			diffrence_type n = std::distance(first, last);
+			// std::cout << std::endl << "[" << n << "]" << std::endl;
+			if (n < _capacity)
+			{
+
+				clear();
+				_size = n;
+				// std::fill(begin(), end(), u);
+				std::copy(first, last, begin());
+			}
+			else
+			{
+				this->~vector();
+				_buffer = _allocater.allocate(n);
+				_size = _capacity = n;
+				// std::fill(begin(), end(), u);
+				std::copy(first, last, begin());
+			}
+				// erase(begin(), end()); // needs to be done
+				// clear();
+				// insert(begin(), first, last);
 			}
 		}
 
@@ -122,7 +141,7 @@ namespace ft
 			***/
 		size_type size() const { return _size; }
 		size_type max_size() const { return _allocater.max_size(); }
-		bool empty() const { return static_cast<bool>(_size); }
+		bool empty() const { return !(size() > 0); }
 		void reserve(size_type n)
 		{
 			if (n > max_size())
@@ -134,8 +153,7 @@ namespace ft
 				_temp = _allocater.allocate(n);
 				for (size_type i = 0; i < _size; i++)
 					_allocater.construct((_temp + i), *(begin() + i));
-				clear();
-				_allocater.deallocate(_buffer, _capacity);
+				this->~vector();
 				_capacity = n;
 				_buffer = _temp;
 				_size = _tmp;
@@ -149,7 +167,7 @@ namespace ft
 			{
 				(_capacity * 2) >= sz ? reserve(_capacity * 2) : reserve(sz);
 
-				for (; _size < _capacity; _size++)
+				for (; _size < sz; _size++)
 					_allocater.construct(_buffer + _size, c);
 			}
 			else
@@ -173,15 +191,15 @@ namespace ft
 		const_reference operator[](size_type n) const { return *(begin() + n); }
 		const_reference at(size_type n) const
 		{
-			if (n > _size)
-				std::out_of_range("vector");
-			return *(begin() + n);
+			if (n >= _size)
+				throw std::out_of_range("vector");
+			return _buffer[n];
 		}
 		reference at(size_type n)
 		{
-			if (n > _size)
-				std::out_of_range("vector");
-			return *(begin() + n);
+			if (n >= _size)
+				throw std::out_of_range("vector");
+			return _buffer[n];
 		}
 		reference front() { return *begin(); }
 		const_reference front() const { return *begin(); }
@@ -190,11 +208,14 @@ namespace ft
 
 		// modifiers:
 
-		void push_back(const value_type &val) { resize(_size + 1, val); }
+		void push_back(const value_type &val) {
+			 resize(size() + 1, val); 
+			
+			 }
 		void pop_back()
 		{
 			_allocater.destroy(_buffer + _size);
-			--_size;
+			_size--;
 		}
 		iterator insert(iterator position, const T &x)
 		{
@@ -269,11 +290,12 @@ namespace ft
 		}
 		/***
 		*/
-		void clear()
-		{
-			while (_size--)
-				_allocater.destroy((_buffer + _size));
-		}
+		void clear() { while (size()) pop_back(); }
+		// void clear()
+		// {
+		// 	while (_size--)
+		// 		_allocater.destroy((_buffer + _size));
+		// }
 	};
 
 
