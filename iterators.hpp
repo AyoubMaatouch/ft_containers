@@ -50,7 +50,7 @@ namespace ft
 			this->_ptrBase++;
 			return tmp;
 		}
-		Iterator &operator--(int)
+		Iterator operator--(int)
 		{
 			Iterator tmp(*this);
 			this->_ptrBase--;
@@ -62,11 +62,11 @@ namespace ft
 		}
 		void operator+=(difference_type index)
 		{
-			this->_ptrBase + index;
+			this->_ptrBase += index;
 		}
 		void operator-=(difference_type index)
 		{
-			this->_ptrBase - index;
+			this->_ptrBase -= index;
 		}
 		Iterator operator-(difference_type index)
 		{
@@ -77,7 +77,7 @@ namespace ft
 		{
 			return this->_ptrBase - sr._ptrBase;
 		}
-		reference operator[](difference_type index)
+		reference operator[](difference_type index) const
 		{
 			return (this->_ptrBase[index]);
 		}
@@ -96,7 +96,7 @@ namespace ft
 	template <class T>
 	bool operator==(Iterator<T> const &y, Iterator<T> const &x)
 	{
-		return ((y._ptrBase) == x._ptrBase);
+		return ((y.base()) == x.base());
 	}
 	template <class T>
 	bool operator!=(Iterator<T> const &y, Iterator<T> const &x)
@@ -146,10 +146,10 @@ namespace ft
 		iterator_type current;
 	public:
 		reverse_iterator() : current() {}
-		explicit reverse_iterator(Iterator x) { current = x; }
+		 reverse_iterator(Iterator x) { current = x; }
 
 		template <class U>
-		reverse_iterator(const reverse_iterator<U> &u) { current = u.current; }
+		reverse_iterator(const reverse_iterator<U> &u) { current = u.base(); }
 		// explicit
 		Iterator base() const { return current; }
 		reference operator*() const
@@ -167,7 +167,7 @@ namespace ft
 
 		reverse_iterator operator++(int)
 		{
-			reverse_iterator tmp = *this;
+			reverse_iterator tmp(*this);
 			--current;
 			return tmp;
 		}
@@ -180,30 +180,24 @@ namespace ft
 
 		reverse_iterator operator--(int)
 		{
-			reverse_iterator tmp = *this;
+			reverse_iterator tmp (*this);
 			++current;
 			return tmp;
 		}
 
-		reverse_iterator operator+(difference_type n) const
-		{
-			return (reverse_iterator(current - n));
-		}
 
+  		reverse_iterator operator+(difference_type a) { return current - a; }
+    	reverse_iterator operator-(difference_type a) { return current + a; }
+		
 		reverse_iterator& operator+=(difference_type n)
 		{
 			current -= n;
 			return (*this);
 		}
 
-		reverse_iterator operator-(difference_type n) const
-		{
-			return reverse_iterator(current + n);
-		}
-
 		reverse_iterator& operator-=(difference_type n)
 		{
-			current -= n;
+			current += n;
 			return (*this);
 		}
 

@@ -5,9 +5,9 @@
 #include "iterators.hpp"
 #include "enable_if.hpp"
 #include "is_intergal.hpp"
-
 namespace ft
 {
+#include "tools.hpp"
 
 	template <class T, class Allocator = std::allocator<T> >
 	class vector
@@ -46,9 +46,9 @@ namespace ft
 		vector(InputIterator first, InputIterator last,
 			   const Allocator &alloc = Allocator(), typename enable_if<!is_integral<InputIterator>::value, bool>::type = false)
 		{
-			typedef typename iterator_traits<InputIterator>::iterator_category category;
-			if (typeid(category) != typeid(std::random_access_iterator_tag()) &&
-				typeid(category) != typeid(std::bidirectional_iterator_tag()))
+			if (typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::random_access_iterator_tag()) ||
+				typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::bidirectional_iterator_tag()) ||
+				typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::forward_iterator_tag()))
 			{
 
 				_allocater = alloc;
@@ -92,21 +92,30 @@ namespace ft
 				std::fill(begin(), end(), u);
 			}
 		}
-		/***
-				template <class InputIterator>
-				  void assign(InputIterator first, InputIterator last);
-			***/
+
+		template <class InputIterator>
+		void assign(InputIterator first, InputIterator last)
+		{
+			if (typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::random_access_iterator_tag()) ||
+				typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::bidirectional_iterator_tag()) ||
+				typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::forward_iterator_tag()))
+			{
+				erase(begin(), end()); // needs to be done
+				insert(begin(), first, last);
+			}
+		}
+
 		allocator_type get_allocator() const { return _allocater; }
 
 		// iterators:
 		iterator begin() { return iterator(_buffer); }
-		const_iterator begin() const { return iterator(_buffer); }
+		const_iterator begin() const { return const_iterator(_buffer); }
 		iterator end() { return iterator((_buffer + (_size))); }
-		const_iterator end() const { return iterator((_buffer + (_size))); }
+		const_iterator end() const { return const_iterator((_buffer + (_size))); }
 		reverse_iterator rbegin() { return reverse_iterator(end()); }
-		const_reverse_iterator rbegin() const { return reverse_iterator(end()); }
+		const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
 		reverse_iterator rend() { return reverse_iterator(begin()); }
-		const_reverse_iterator rend() const { return reverse_iterator(begin()); }
+		const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
 		/***
 			// capacity:
@@ -187,46 +196,78 @@ namespace ft
 			_allocater.destroy(_buffer + _size);
 			--_size;
 		}
-		iterator insert(iterator position, const T& x)
+		iterator insert(iterator position, const T &x)
 		{
-			diffrence_type dis = position >  end() ? -1 : std::distance (begin(), position) ;
-			if ( _size == _capacity) { reserve(_capacity * 2); }
-			std::copy_backward(begin() + (dis) , end(), end() + 1);
+			diffrence_type dis = position > end() ? -1 : std::distance(begin(), position);
+			if (_size == _capacity)
+			{
+				reserve(_capacity * 2);
+			}
+			std::copy_backward(begin() + (dis), end(), end() + 1);
 			*(begin() + dis) = x;
 			++_size;
 			return begin() + (dis);
 		}
-		void insert(iterator position, size_type n, const T& x)
+		void insert(iterator position, size_type n, const T &x)
 		{
-			diffrence_type dis = position >  end() ? -1 : std::distance (begin(), position) ;
-			if ( (_size + n) > _capacity) { 
-				(_capacity + n) < _capacity * 2 ?  reserve(_capacity * 2) : reserve(_capacity + n); }
-			std::copy_backward(begin() + (dis) , end(), end() + 1);
+			diffrence_type dis = position > end() ? -1 : std::distance(begin(), position);
+			if ((_size + n) > _capacity)
+			{
+				(_capacity + n) < _capacity * 2 ? reserve(_capacity * 2) : reserve(_capacity + n);
+			}
+			std::copy_backward(begin() + (dis), end(), end() + 1);
 			std::fill(begin() + (dis), (begin() + dis) + n, x);
 			_size += n;
-
 		}
 		template <class InputIterator>
 		void insert(iterator position,
-						InputIterator first, InputIterator last, typename enable_if<!is_integral<InputIterator>::value, bool>::type = false)
+					InputIterator first, InputIterator last, typename enable_if<!is_integral<InputIterator>::value, bool>::type = false)
 		{
-			typedef typename iterator_traits<InputIterator>::iterator_category category;
-			if (typeid(category) != typeid(std::random_access_iterator_tag()) &&
-				typeid(category) != typeid(std::bidirectional_iterator_tag()))
+			if (typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::random_access_iterator_tag()) ||
+				typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::bidirectional_iterator_tag()) ||
+				typeid(typename iterator_traits<InputIterator>::iterator_category) != typeid(std::forward_iterator_tag()))
 			{
-			// 	diffrence_type dis = position >  end() ? -1 : std::distance (begin(), position) ;
-			// if ( (_size + n) > _capacity) { 
-			// 	(_capacity + n) < _capacity * 2 ?  reserve(_capacity * 2) : reserve(_capacity + n); }
-			// std::copy_backward(begin() + (dis) , end(), end() + 1);
-			// std::fill(begin() + (dis), (begin() + dis) + n, x);
-			// _size += n;
-			//// here you implement a range inserter ....
+				diffrence_type dis = position > end() ? -1 : std::distance(begin(), position);
+				diffrence_type len = std::distance(first, last);
+
+				if (len > 0)
+				{
+					if ((_size + len) > _capacity)
+					{
+						(_capacity + len) < _capacity * 2 ? reserve(_capacity * 2) : reserve(_capacity + len);
+					}
+					std::copy_backward(begin() + (dis), end(), end() + len);
+					std::copy(first, last, begin() + dis);
+					_size += len;
+				}
 			}
 		}
+		iterator erase(iterator position)
+		{
+			diffrence_type dis = std::distance(begin(), position);
+			_allocater.destroy((_buffer + dis));
+			std::copy(begin() + (dis + 1), end(), begin() + dis);
+			--_size;
+			return begin() + dis;
+		}
+		iterator erase(iterator first, iterator last)
+		{
+			diffrence_type dis = std::distance(begin(), first);
+			diffrence_type len = std::distance(first, last);
+			for (diffrence_type n = 0; n < len; n++)
+				_allocater.destroy((_buffer + (dis + n)));
+			std::copy(begin() + (dis + 1), end(), begin() + dis);
+			_size -= len;
+			return begin() + dis;
+		}
+		void     swap(vector<T,Allocator>& x)
+		{
+			std::swap(_buffer, x._buffer);
+			std::swap(_size, x._size);
+			std::swap(_capacity, x._capacity);
+			std::swap(_allocater, x._allocater);
+		}
 		/***
-		iterator erase(iterator position);
-		iterator erase(iterator first, iterator last);
-		void     swap(vector<T,Allocator>&);
 		*/
 		void clear()
 		{
@@ -234,25 +275,48 @@ namespace ft
 				_allocater.destroy((_buffer + _size));
 		}
 	};
-	// template <class T, class Allocator>
-	// bool operator==(const vector<T,Allocator>& x,
-	// const vector<T,Allocator>& y);
-	// template <class T, class Allocator>
-	// bool operator< (const vector<T,Allocator>& x,
-	// const vector<T,Allocator>& y);
-	// template <class T, class Allocator>
-	// bool operator!=(const vector<T,Allocator>& x,
-	// const vector<T,Allocator>& y);
-	// template <class T, class Allocator>
-	// bool operator> (const vector<T,Allocator>& x,
-	// const vector<T,Allocator>& y);
-	// template <class T, class Allocator>
-	// bool operator>=(const vector<T,Allocator>& x,
-	// const vector<T,Allocator>& y);
-	// template <class T, class Allocator>
-	// bool operator<=(const vector<T,Allocator>& x,
-	// const vector<T,Allocator>& y);
+
+
+		template <class T, class Allocator>
+		bool operator==(const vector<T, Allocator> &x, const vector<T, Allocator> &y)
+		{
+			return x.size() == y.size() && ft::equal(x.begin(), x.end(), y.begin());
+		}
+
+		template <class T, class Allocator>
+		bool operator!=(const vector<T, Allocator> &x, const vector<T, Allocator> &y)
+		{
+			return !(x == y);
+		}
+
+		template <class T, class Allocator>
+		bool operator<(const vector<T, Allocator> &x, const vector<T, Allocator> &y)
+		{
+			return ft::lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
+		}
+
+		template <class T, class Allocator>
+		bool operator<=(const vector<T, Allocator> &x, const vector<T, Allocator> &y)
+		{
+			return x == y || x < y;
+		}
+		template <class T, class Allocator>
+		bool operator>(const vector<T, Allocator> &x, const vector<T, Allocator> &y)
+		{
+			return (ft::lexicographical_compare(y.begin(), y.end(), x.begin(), x.end()));
+		}
+
+		template <class T, class Allocator>
+		bool operator>=(const vector<T, Allocator> &x, const vector<T, Allocator> &y)
+		{
+			return x == y || x > y;
+		}
+
+
 	/**specialized algorithms:***/
-	// template <class T, class Allocator>
-	// void swap(vector<T,Allocator>& x, vector<T,Allocator>& y);
+	template <class T, class Allocator>
+	void swap(vector<T,Allocator>& x, vector<T,Allocator>& y)
+	{
+		x.swap(y);
+	}
 }
