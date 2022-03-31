@@ -222,8 +222,9 @@ namespace ft
 			diffrence_type dis = position > end() ? -1 : std::distance(begin(), position);
 			if (_size == _capacity)
 			{
-				reserve(_capacity * 2);
+				(!_capacity) ? reserve(1) : reserve(_capacity * 2);
 			}
+			
 			std::copy_backward(begin() + (dis), end(), end() + 1);
 			*(begin() + dis) = x;
 			++_size;
@@ -236,7 +237,8 @@ namespace ft
 			{
 				(_capacity + n) < _capacity * 2 ? reserve(_capacity * 2) : reserve(_capacity + n);
 			}
-			std::copy_backward(begin() + (dis), end(), end() + 1);
+			std::copy_backward(begin() + (dis), end(), end() + n);
+			
 			std::fill(begin() + (dis), (begin() + dis) + n, x);
 			_size += n;
 		}
