@@ -5,6 +5,15 @@
 #include "iterators.hpp"
 #include "enable_if.hpp"
 #include "is_intergal.hpp"
+
+/***
+ * TO-doo
+ * adding try catch to copy and copy-backwords and allocater 
+ * fix fsanitize problem 
+ * imploment the stack
+ ***/
+
+
 namespace ft
 {
 #include "tools.hpp"
