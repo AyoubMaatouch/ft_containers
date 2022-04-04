@@ -16,13 +16,15 @@ namespace ft
 		typedef typename std::random_access_iterator_tag iterator_category;
 		
 		Iterator(void) : _ptrBase() {}	
-		Iterator(pointer p)
+		Iterator(pointer p) : _ptrBase(p) 
 		{
-			_ptrBase = p;
+			// _ptrBase = p;
 		}
 		
 		template <class U>
-		Iterator(const Iterator<U> &u) { _ptrBase = u.base(); }
+		Iterator(const Iterator<U> &u): _ptrBase(u.base()) { 
+			// _ptrBase = u.base(); 
+			}
 		
 		pointer base() const { return _ptrBase; }
 
@@ -146,10 +148,10 @@ namespace ft
 		iterator_type current;
 	public:
 		reverse_iterator() : current() {}
-		 reverse_iterator(Iterator x) { current = x; }
+		 reverse_iterator(Iterator x ): current(x) {  }
 
 		template <class U>
-		reverse_iterator(const reverse_iterator<U> &u) { current = u.base(); }
+		reverse_iterator(const reverse_iterator<U> &u): current (u.base()) {  }
 		// explicit
 		Iterator base() const { return current; }
 		reference operator*() const
