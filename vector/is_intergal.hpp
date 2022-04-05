@@ -6,7 +6,6 @@ template <class T, T v>
 struct integral_constant {
   static const T value = v;
   typedef T value_type;
-  integral_constant() { return (v); }
 };
 template <typename T> 
 	struct is_integral : public integral_constant<bool,false>

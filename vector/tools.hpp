@@ -5,7 +5,6 @@
       {
           while (first != last)
           {
-            //   *first = val;
               alloc.construct(&(*first), val);
               ++first;
           }
@@ -15,7 +14,6 @@
       {
           while (first != last)
           {
-            //   *result = *first;
               alloc.construct(&(*result), *first);
               ++result; ++first;
           }
@@ -25,7 +23,6 @@
       {
           while(last!=first)
                 alloc.construct(&*(--result), *(--last));
-            // *(--result) = *(--last);
       }
 
 template <class InputIterator1, class InputIterator2>

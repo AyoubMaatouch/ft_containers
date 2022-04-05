@@ -313,18 +313,13 @@ namespace ft
 			std::swap(_capacity, x._capacity);
 			std::swap(_allocater, x._allocater);
 		}
-		/***
-		 */
+
 		void clear()
 		{
 			while (size())
 				pop_back();
 		}
-		// void clear()
-		// {
-		// 	while (_size--)
-		// 		_allocater.destroy((_buffer + _size));
-		// }
+
 	};
 
 	template <class T, class Allocator>
