@@ -240,8 +240,8 @@ namespace ft
 			if (_size)
 			{
 				/* code */
-				_allocater.destroy(&_buffer[_size]);
 				_size--;
+				_allocater.destroy(&_buffer[_size]);
 			}
 		}
 		iterator insert(iterator position, const T &x)
