@@ -67,7 +67,7 @@ namespace ft
 			{
 				_size = _capacity = std::distance(first, last);
 				_buffer = _allocater.allocate(_capacity);
-				std::copy(first, last, begin());
+				ft::copy(first, last, begin(), _allocater);
 			}
 		}
 		~vector()
@@ -79,7 +79,7 @@ namespace ft
 				_allocater.deallocate(_buffer, _capacity);
 			}
 		}
-		vector(const vector<T, Allocator> &x) : _buffer(),_capacity(0), _size(0), _allocater(x._allocater)
+		vector(const vector<T, Allocator> &x) : _buffer(), _capacity(0), _size(0), _allocater(x._allocater)
 		{
 			*this = x;
 		}
@@ -90,7 +90,7 @@ namespace ft
 			reserve(x.capacity());
 			_size = x.size();
 			if (_size > 0)
-				std::copy(x.begin(), x.end(), begin());
+				ft::copy(x.begin(), x.end(), begin(), _allocater);
 			return (*this);
 		}
 		void assign(size_type n, const T &u)
@@ -100,14 +100,14 @@ namespace ft
 			{
 				clear();
 				_size = n;
-				std::fill(begin(), end(), u);
+				ft::fill(begin(), end(), u, _allocater);
 			}
 			else
 			{
 				this->~vector();
 				_buffer = _allocater.allocate(n);
 				_size = _capacity = n;
-				std::fill(begin(), end(), u);
+				ft::fill(begin(), end(), u, _allocater);
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace ft
 		{
 			_size = 0;
 			typedef typename iterator_traits<InputIterator>::iterator_category category;
-			if (typeid(category()) != typeid(std::random_access_iterator_tag()) && typeid(category()) != typeid(std::bidirectional_iterator_tag()) && typeid(category()) != typeid(std::forward_iterator_tag())) 
+			if (typeid(category()) != typeid(std::random_access_iterator_tag()) && typeid(category()) != typeid(std::bidirectional_iterator_tag()) && typeid(category()) != typeid(std::forward_iterator_tag()))
 			{
 
 				while (first != last)
@@ -132,14 +132,14 @@ namespace ft
 				{
 					clear();
 					_size = n;
-					std::copy(first, last, begin());
+					ft::copy(first, last, begin(), _allocater);
 				}
 				else
 				{
 					this->~vector();
 					_buffer = _allocater.allocate(n);
 					_size = _capacity = n;
-					std::copy(first, last, begin());
+					ft::copy(first, last, begin(), _allocater);
 				}
 			}
 		}
@@ -151,7 +151,7 @@ namespace ft
 		const_iterator begin() const { return const_iterator(_buffer); }
 		iterator end() { return iterator((_buffer + (_size))); }
 		const_iterator end() const { return const_iterator((_buffer + (_size))); }
-		
+
 		reverse_iterator rbegin() { return reverse_iterator(end()); }
 		const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
 		reverse_iterator rend() { return reverse_iterator(begin()); }
@@ -239,29 +239,22 @@ namespace ft
 		{
 			if (_size)
 			{
-				try
-				{
-					/* code */
-					_allocater.destroy(&_buffer[_size]);
-					_size--;
-				}
-				catch(const std::exception& e)
-				{
-					std::cerr << e.what() << '\n';
-				}
-				
+				/* code */
+				_allocater.destroy(&_buffer[_size]);
+				_size--;
 			}
 		}
 		iterator insert(iterator position, const T &x)
 		{
-			diffrence_type dis = position > end() ? -1 : std::distance(begin(), position);
+			diffrence_type dis = position > end() ? -1 : position - begin(); // std::distance(begin(), position);
 			if (_size == _capacity)
 			{
 				(!_capacity) ? reserve(1) : reserve(_capacity * 2);
 			}
 
-			std::copy_backward(begin() + (dis), end(), end() + 1);
-			*(begin() + dis) = x;
+			ft::copy_backward(begin() + (dis), end(), end() + 1, _allocater);
+			// *(begin() + dis) = x;
+			_allocater.construct(&_buffer[dis], x);
 			++_size;
 			return begin() + (dis);
 		}
@@ -272,34 +265,34 @@ namespace ft
 			{
 				(_capacity + n) < _capacity * 2 ? reserve(_capacity * 2) : reserve(_capacity + n);
 			}
-			std::copy_backward(begin() + (dis), end(), end() + n);
+			ft::copy_backward(begin() + (dis), end(), end() + n, _allocater);
 
-			std::fill(begin() + (dis), (begin() + dis) + n, x);
+			ft::fill(begin() + (dis), (begin() + dis) + n, x, _allocater);
 			_size += n;
 		}
 		template <class InputIterator>
 		void insert(iterator position,
 					InputIterator first, InputIterator last, typename enable_if<!is_integral<InputIterator>::value, bool>::type = false)
 		{
-				diffrence_type dis = position > end() ? -1 : std::distance(begin(), position);
-				diffrence_type len = std::distance(first, last);
+			diffrence_type dis = position > end() ? -1 : std::distance(begin(), position);
+			diffrence_type len = std::distance(first, last);
 
-				if (len > 0)
+			if (len > 0)
+			{
+				if ((_size + len) > _capacity)
 				{
-					if ((_size + len) > _capacity)
-					{
-						(_capacity + len) < _capacity * 2 ? reserve(_capacity * 2) : reserve(_capacity + len);
-					}
-					std::copy_backward(begin() + (dis), end(), end() + len);
-					std::copy(first, last, begin() + dis);
-					_size += len;
+					(_capacity + len) < _capacity * 2 ? reserve(_capacity * 2) : reserve(_capacity + len);
 				}
+				ft::copy_backward(begin() + (dis), end(), end() + len, _allocater);
+				ft::copy(first, last, begin() + dis, _allocater);
+				_size += len;
+			}
 		}
 		iterator erase(iterator position)
 		{
 			diffrence_type dis = std::distance(begin(), position);
 			_allocater.destroy((_buffer + dis));
-			std::copy(begin() + (dis + 1), end(), begin() + dis);
+			ft::copy(begin() + (dis + 1), end(), begin() + dis, _allocater);
 			--_size;
 			return begin() + dis;
 		}
@@ -309,7 +302,7 @@ namespace ft
 			diffrence_type len = std::distance(first, last);
 			for (diffrence_type n = 0; n < len; n++)
 				_allocater.destroy((_buffer + (dis + n)));
-			std::copy(begin() + (dis + 1), end(), begin() + dis);
+			ft::copy(begin() + (dis + 1), end(), begin() + dis, _allocater);
 			_size -= len;
 			return begin() + dis;
 		}
