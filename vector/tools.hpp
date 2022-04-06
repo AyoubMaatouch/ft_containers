@@ -1,5 +1,9 @@
 #pragma once
 
+    template <class T> void swap ( T& a, T& b )
+    {
+      T c(a); a=b; b=c;
+    }
   template <class Iterator, class T, class Allo>
       void fill(Iterator first, Iterator last, const T &val, Allo alloc)
       {

@@ -308,10 +308,10 @@ namespace ft
 		}
 		void swap(vector<T, Allocator> &x)
 		{
-			std::swap(_buffer, x._buffer);
-			std::swap(_size, x._size);
-			std::swap(_capacity, x._capacity);
-			std::swap(_allocater, x._allocater);
+			ft::swap(_buffer, x._buffer);
+			ft::swap(_size, x._size);
+			ft::swap(_capacity, x._capacity);
+			ft::swap(_allocater, x._allocater);
 		}
 
 		void clear()
