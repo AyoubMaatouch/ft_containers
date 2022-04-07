@@ -201,7 +201,8 @@ namespace ft
 			void					pop_back() {	_size--; _alloc.destroy(_arr + _size);	}
 
 			iterator				insert(iterator position, const value_type& val) {
-				size_type dist = std::distance(begin(), position);
+				size_type dist = position - begin();
+				//std::distance(begin(), position);
 			
 				push_back(val);
 				position = begin() + dist;
@@ -215,8 +216,10 @@ namespace ft
 			}
 			void					insert(iterator position, size_type n, const value_type& val)
 			{
-				size_type dist = std::distance(begin(), position);
-				size_type len = std::distance(position, end());
+				size_type dist =  position - begin();
+				//std::distance(begin(), position);
+				size_type len = end() - position;
+				//std::distance(position, end());
 
 				if (_size + n > _capacity)
 				{
@@ -250,9 +253,12 @@ namespace ft
 										typename enable_if<!is_integral<InputIterator>::value, InputIterator>::type = InputIterator()
 									)
 				{
-					size_type dist = std::distance(begin(), position);
-					size_type range = std::distance(first, last);
-					size_type len = std::distance(position, end());
+					size_type dist =  position - begin();
+					// std::distance(begin(), position);
+					size_type range = last - first;
+					//std::distance(first, last);
+					size_type len = end() - position;
+					//std::distance(position, end());
 					
 
 					if (_size + range > _capacity)
@@ -293,7 +299,8 @@ namespace ft
 			iterator 				erase(iterator first, iterator last)
 			{
 				iterator ret = first;
-				size_type dist = std::distance(begin(), first);
+				size_type dist =  first - begin();
+				//std::distance(begin(), first);
 				if (last == end())
 				{
 					for (;first != last; first++, dist++)
