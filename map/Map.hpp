@@ -1,11 +1,13 @@
 #pragma once
 #include <memory>
 #include <iostream>
+#include "../vector/iterators.hpp"
 
 namespace ft
 {
-  template <class Key, class T, class Compare = std::less<Key>,
-            class Allocator = std::allocator<std::pair<const Key, T> > >
+  # include "pair.hpp"
+  template <class Key, class T, class Compare = ft::less<Key>,
+            class Allocator = std::allocator<ft::pair<const Key, T> > >
   class map
   {
   public:
@@ -17,18 +19,17 @@ namespace ft
     typedef Allocator allocator_type;
     typedef typename Allocator::reference reference;
     typedef typename Allocator::const_reference const_reference;
-    typedef implementation defined iterator;        // See 23.1
-    typedef implementation defined const_iterator;  // See 23.1
-    typedef implementation defined size_type;       // See 23.1
-    typedef implementation defined difference_type; // See 23.1
+    typedef "implementation defined" iterator;        // See 23.1
+    typedef "implementation defined" const_iterator;  // See 23.1
+    typedef  size_t size_type;       // See 23.1
+    typedef  ptrdiff_t difference_type; // See 23.1
     typedef typename Allocator::pointer pointer;
     typedef typename Allocator::const_pointer const_pointer;
-    typedef std::reverse_iterator<iterator> reverse_iterator;
-    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+    typedef ft::reverse_iterator<iterator> reverse_iterator;
+    typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
     //  khaaarita
-    class value_compare
-        : public binary_function<value_type, value_type, bool>
+    class value_compare : public binary_function<value_type, value_type, bool>
     {
       friend class map;
 
