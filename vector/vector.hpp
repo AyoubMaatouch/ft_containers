@@ -29,10 +29,10 @@ namespace ft
 		typedef Allocator allocator_type;
 		typedef typename Allocator::pointer pointer;
 		typedef typename Allocator::const_pointer const_pointer;
-		typedef ::ft::Iterator<T> iterator;
-		typedef ::ft::Iterator<const T> const_iterator;
-		typedef ::ft::reverse_iterator<iterator> reverse_iterator;
-		typedef ::ft::reverse_iterator<const_iterator> const_reverse_iterator;
+		typedef ft::Iterator<T> iterator;
+		typedef ft::Iterator<const T> const_iterator;
+		typedef ft::reverse_iterator<iterator> reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 	private:
 		pointer _buffer;
@@ -42,7 +42,7 @@ namespace ft
 
 		// construct/copy/destroy:
 	public:
-		explicit vector(const Allocator &alloc = Allocator()) : _buffer(nullptr), _size(0), _capacity(0), _allocater(alloc) {}
+		explicit vector(const Allocator &alloc = Allocator()) : _buffer(nullptr) , _allocater(alloc) , _size(0), _capacity(0) {}
 		explicit vector(size_type n, const T &value = T(),
 						const Allocator &alloc = Allocator()) : _buffer(nullptr), _allocater(alloc), _size(n), _capacity(n)
 		{
@@ -79,7 +79,7 @@ namespace ft
 				_allocater.deallocate(_buffer, _capacity);
 			}
 		}
-		vector(const vector<T, Allocator> &x) : _buffer(), _capacity(0), _size(0), _allocater(x._allocater)
+		vector(const vector<T, Allocator> &x) : _buffer(), _allocater(x._allocater) , _size(0) , _capacity(0)
 		{
 			*this = x;
 		}
@@ -112,7 +112,7 @@ namespace ft
 		}
 
 		template <class InputIterator>
-		void assign(InputIterator first, InputIterator last)
+		void assign(InputIterator first, InputIterator last, typename enable_if<!is_integral<InputIterator>::value, bool>::type = false)
 		{
 			_size = 0;
 			typedef typename iterator_traits<InputIterator>::iterator_category category;
@@ -128,7 +128,7 @@ namespace ft
 			else
 			{
 				diffrence_type n = std::distance(first, last);
-				if (n < _capacity)
+				if ((unsigned long)n < _capacity)
 				{
 					clear();
 					_size = n;
