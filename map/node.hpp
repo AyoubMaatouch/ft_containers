@@ -1,10 +1,16 @@
-// AVL tree implementation in Java
+// TO_DO 
+/***
+ * replace new with allocate
+ * and replace comparision with alloc
+ * 
+ * */
 #pragma once
 #include <iostream> 
 #include "pair.hpp"
 // Create node
 template <class T>
 struct Node {
+ 
   T item; 
   int height;
   Node<T>* left;
@@ -26,15 +32,23 @@ struct Node {
 };
 
 // Tree class
-template <class T>
+template <class T, class Compare> // class Alloc
 struct AVLTree {
-
-  Node<T>* root;
+  typedef Compare comp;
+  typedef T value_type;
+  typedef typename value_type::first_type key_type;
+	typedef typename value_type::second_type mapped_type;
+	// typedef std::allocator<ft::pair<const key_type, mapped_type> > Alloc;
+	// typedef typename Alloc::template rebind<Node>::other  alloc_type;
+	// alloc_type alloc;
+  
+  Node<value_type>* root;
+ 
   AVLTree()
   {
     root = NULL;
   } 
-  int height(Node<T>* N) {
+  int height(Node<value_type>* N) {
     if (N == NULL)
       return 0;
     return N->height;
@@ -44,9 +58,9 @@ struct AVLTree {
     return (a > b) ? a : b;
   }
 
-  Node<T>* rightRotate(Node<T>* y) {
-    Node<T>* x =  y->left;
-    Node<T>* T2 = x->right;
+  Node<value_type>* rightRotate(Node<value_type>* y) {
+    Node<value_type>* x =  y->left;
+    Node<value_type>* T2 = x->right;
     x->right = y;
     y->left = T2;
     y->height = max(height(y->left), height(y->right)) + 1;
@@ -54,9 +68,9 @@ struct AVLTree {
     return x;
   }
 
-  Node<T>* leftRotate(Node<T>* x) {
-    Node<T>* y = x->right;
-    Node<T>* T2 = y->left;
+  Node<value_type>* leftRotate(Node<value_type>* x) {
+    Node<value_type>* y = x->right;
+    Node<value_type>* T2 = y->left;
     y->left = x;
     x->right = T2;
     x->height = max(height(x->left), height(x->right)) + 1;
@@ -65,19 +79,20 @@ struct AVLTree {
   }
 
   // Get balance factor of a node
-  int getBalanceFactor(Node<T>* N) {
+  int getBalanceFactor(Node<value_type>* N) {
     if (N == NULL)
       return 0;
     return height(N->left) - height(N->right);
   }
 
-  // Insert a node
-  Node<T>* insertNode(Node<T>* node, T item) {
+
+  Node<value_type>* insertNode(Node<value_type>* node, T item) {
 
     // Find the position and insert the node
     if (node == NULL)
-      return (new Node<T>(item));
-    if (item < node->item)
+      return (new Node<value_type>(item));
+    // std::cout << << std::endl;
+    if ((item < node->item))
       node->left = insertNode(node->left, item);
     else if (item > node->item)
       node->right = insertNode(node->right, item);
@@ -107,26 +122,26 @@ struct AVLTree {
     return node;
   }
 
-  Node<T>* nodeWithMimumValue(Node<T>* node) {
-    Node<T>* current = node;
+  Node<value_type>* nodeWithMimumValue(Node<value_type>* node) {
+    Node<value_type>* current = node;
     while (current->left != NULL)
       current = current->left;
     return current;
   }
 
   // Delete a node
-  Node<T>* deleteNode(Node<T>* root, T item) {
+  Node<value_type>* deleteNode(Node<value_type>* root, T item) {
 
     // Find the node to be deleted and remove it
     if (root == NULL)
-      return new Node<T>();
+      return new Node<value_type>();
     if (item < root->item)
       root->left = deleteNode(root->left, item);
     else if (item > root->item)
       root->right = deleteNode(root->right, item);
     else {
       if ((root->left == NULL) || (root->right == NULL)) {
-        Node<T>* temp = NULL;
+        Node<value_type>* temp = NULL;
         if (temp == root->left)
           temp = root->right;
         else
@@ -137,7 +152,7 @@ struct AVLTree {
         } else
           root = temp;
       } else {
-        Node<T>* temp = nodeWithMimumValue(root->right);
+        Node<value_type>* temp = nodeWithMimumValue(root->right);
         root->item = temp->item;
         root->right = deleteNode(root->right, temp->item);
       }
@@ -166,13 +181,14 @@ struct AVLTree {
     }
     return root;
   }
-  void preOrder(Node<T>* node) {
+  void preOrder(Node<value_type>* node) {
     if (node != NULL) {
       preOrder(node->right);
       preOrder(node->left);
     }
   }
-  void printTree(Node<T>* currPtr, std::string indent, bool last) {
+
+  void printTree(Node<value_type>* currPtr, std::string indent, bool last) {
     if (currPtr != nullptr) {
       std::cout << indent ;
       if (last) {
