@@ -8,19 +8,27 @@
 #include <iostream> 
 #include "pair.hpp"
 // Create node
-template <class T>
+template <class T, class Alloc>
 struct Node {
- 
-  T item; 
+  T *item; 
   int height;
-  Node<T>* left;
-  Node<T>* right;
+  Node<T, Alloc>* left;
+  Node<T, Alloc>* parent;
+  Node<T, Alloc>* right;
+  Alloc _allocator;
 
-  Node(T d) {
-    item = d;
+  Node(T d, Node* par) {
+   item =  _allocator.allocate(sizeof(T));
+    _allocator.construct(item, d);
     height = 1;
-    left = NULL;
     right = NULL;
+    left = NULL;
+    parent = par;
+  }
+  ~Node()
+  {
+    // _allocator.destory(item);
+    _allocator.deallocate(item, sizeof(T));
   }
 
   Node() {
@@ -28,27 +36,26 @@ struct Node {
     height = 0;
     left = NULL;
     right = NULL;
+    parent = NULL;
   }
 };
 
 // Tree class
-template <class T, class Compare> // class Alloc
+template <class T, class Compare, class Alloc> // class Alloc
 struct AVLTree {
   typedef Compare comp;
   typedef T value_type;
   typedef typename value_type::first_type key_type;
 	typedef typename value_type::second_type mapped_type;
-	// typedef std::allocator<ft::pair<const key_type, mapped_type> > Alloc;
-	// typedef typename Alloc::template rebind<Node>::other  alloc_type;
-	// alloc_type alloc;
-  
-  Node<value_type>* root;
+	// typedef std::allocator<T> Alloc;
+  typedef Node<value_type, Alloc> Node;
+  Node* root;
  
   AVLTree()
   {
     root = NULL;
   } 
-  int height(Node<value_type>* N) {
+  int height(Node* N) {
     if (N == NULL)
       return 0;
     return N->height;
@@ -57,45 +64,54 @@ struct AVLTree {
   int max(int a, int b) {
     return (a > b) ? a : b;
   }
+  void parent_correction(Node *&n, Node *p)
+		{
+			if (!n)
+				return ;
+			parent_correction(n->right, n);
+			n->parent = p;
+			parent_correction(n->left, n);
+		}
 
-  Node<value_type>* rightRotate(Node<value_type>* y) {
-    Node<value_type>* x =  y->left;
-    Node<value_type>* T2 = x->right;
+  Node* rightRotate(Node* y) {
+    Node* x =  y->left;
+    Node* T2 = x->right;
     x->right = y;
     y->left = T2;
+    parent_correction(y, x->parent);
     y->height = max(height(y->left), height(y->right)) + 1;
     x->height = max(height(x->left), height(x->right)) + 1;
     return x;
   }
 
-  Node<value_type>* leftRotate(Node<value_type>* x) {
-    Node<value_type>* y = x->right;
-    Node<value_type>* T2 = y->left;
+  Node* leftRotate(Node* x) {
+    Node* y = x->right;
+    Node* T2 = y->left;
+
     y->left = x;
     x->right = T2;
+    parent_correction(y, x->parent);
     x->height = max(height(x->left), height(x->right)) + 1;
     y->height = max(height(y->left), height(y->right)) + 1;
     return y;
   }
 
   // Get balance factor of a node
-  int getBalanceFactor(Node<value_type>* N) {
+  int getBalanceFactor(Node* N) {
     if (N == NULL)
       return 0;
     return height(N->left) - height(N->right);
   }
 
 
-  Node<value_type>* insertNode(Node<value_type>* node, T item) {
+  Node* insertNode(Node* node, Node* parent,T item) {
 
-    // Find the position and insert the node
     if (node == NULL)
-      return (new Node<value_type>(item));
-    // std::cout << << std::endl;
-    if ((item < node->item))
-      node->left = insertNode(node->left, item);
-    else if (item > node->item)
-      node->right = insertNode(node->right, item);
+      return (new Node(item, parent));
+    if ((item < *(node->item)))
+      node->left = insertNode(node->left, node, item);
+    else if (item > *(node->item))
+      node->right = insertNode(node->right,node, item);
     else
       return node;
 
@@ -104,44 +120,48 @@ struct AVLTree {
     node->height = 1 + max(height(node->left), height(node->right));
     int balanceFactor = getBalanceFactor(node);
     if (balanceFactor > 1) {
-      if (item < node->left->item) {
+      if (item < *(node->left->item)) {
         return rightRotate(node);
-      } else if (item > node->left->item) {
+      } else if (item > *(node->left->item)) {
         node->left = leftRotate(node->left);
         return rightRotate(node);
       }
     }
     if (balanceFactor < -1) {
-      if (item > node->right->item) {
+      if (item > *(node->right->item)) {
         return leftRotate(node);
-      } else if (item < node->right->item) {
+      } else if (item < *(node->right->item)) {
         node->right = rightRotate(node->right);
         return leftRotate(node);
       }
     }
+    if (node->left)
+				node->left->parent = node;
+		if (node->right)
+				node->right->parent = node;
     return node;
   }
 
-  Node<value_type>* nodeWithMimumValue(Node<value_type>* node) {
-    Node<value_type>* current = node;
+  Node* nodeWithMimumValue(Node* node) {
+    Node* current = node;
     while (current->left != NULL)
       current = current->left;
     return current;
   }
 
   // Delete a node
-  Node<value_type>* deleteNode(Node<value_type>* root, T item) {
+  Node* deleteNode(Node* root, T item) {
 
     // Find the node to be deleted and remove it
     if (root == NULL)
-      return new Node<value_type>();
-    if (item < root->item)
+      return new Node();
+    if (item < *(root->item))
       root->left = deleteNode(root->left, item);
-    else if (item > root->item)
+    else if (item > *(root->item))
       root->right = deleteNode(root->right, item);
     else {
       if ((root->left == NULL) || (root->right == NULL)) {
-        Node<value_type>* temp = NULL;
+        Node* temp = NULL;
         if (temp == root->left)
           temp = root->right;
         else
@@ -150,11 +170,12 @@ struct AVLTree {
           temp = root;
           root = NULL;
         } else
-          root = temp;
+          *root = *temp;
+          delete temp;
       } else {
-        Node<value_type>* temp = nodeWithMimumValue(root->right);
+        Node* temp = nodeWithMimumValue(root->right);
         root->item = temp->item;
-        root->right = deleteNode(root->right, temp->item);
+        root->right = deleteNode(root->right, *(temp->item));
       }
     }
     if (root == NULL)
@@ -179,16 +200,14 @@ struct AVLTree {
         return leftRotate(root);
       }
     }
+     if (root->left)
+				root->left->parent = root;
+			if (root->right)
+				root->right->parent = root;
     return root;
   }
-  void preOrder(Node<value_type>* node) {
-    if (node != NULL) {
-      preOrder(node->right);
-      preOrder(node->left);
-    }
-  }
 
-  void printTree(Node<value_type>* currPtr, std::string indent, bool last) {
+  void printTree(Node* currPtr, std::string indent, bool last) {
     if (currPtr != nullptr) {
       std::cout << indent ;
       if (last) {
@@ -198,9 +217,32 @@ struct AVLTree {
         std::cout << "L---- ";
         indent += "|  ";
       }
-      std::cout << (currPtr->item)<<std::endl;
+      std::cout << *(currPtr->item) << std::endl;
       printTree(currPtr->left, indent, false);
       printTree(currPtr->right, indent, true);
     }
   }
+  void printpreorder(
+	Node* root)
+{
+	// Print the node's value along
+	// with its parent value
+	std::cout << "Node: " << *(root->item)
+		<< ", Parent Node: ";
+
+	if (root->parent != NULL)
+		std::cout << *(root->parent->item) << std::endl;
+	else
+		std::cout << "NULL" << std::endl;
+
+	// Recur to the left subtree
+	if (root->left != NULL) {
+		printpreorder(root->left);
+	}
+
+	// Recur to the right subtree
+	if (root->right != NULL) {
+		printpreorder(root->right);
+	}
+}
 };
