@@ -148,6 +148,12 @@ struct AVLTree {
       current = current->left;
     return current;
   }
+  // Node* nodeWithMaxValue(Node* node) {
+  //   Node* current = node;
+  //   while (current->right != NULL)
+  //     current = current->right;
+  //   return current;
+  // }
 
   // Delete a node
   Node* deleteNode(Node* root, T item) {
