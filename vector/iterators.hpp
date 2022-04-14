@@ -209,7 +209,7 @@ public:
 	}
 };
 template<class T>
-Iterator<T> operator+(int a,Iterator<T> it) { Iterator<T> tmp = it; return tmp + a; }
+Iterator<T> operator+( size_t n, Iterator<T> it) { Iterator<T> tmp = it; return tmp + n; }
 
 // template<typename T>
 // Iterator<T>	operator+(ptrdiff_t n, const Iterator<T> &it)
