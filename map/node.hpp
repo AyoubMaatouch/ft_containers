@@ -6,29 +6,31 @@
  * */
 #pragma once
 #include <iostream> 
+#include <memory> 
 #include "pair.hpp"
 // Create node
 template <class T, class Alloc>
 struct Node {
-  T *item; 
+  T item; 
   int height;
   Node<T, Alloc>* left;
   Node<T, Alloc>* parent;
   Node<T, Alloc>* right;
   Alloc _allocator;
 
-  Node(T d, Node* par) {
-   item =  _allocator.allocate(sizeof(T));
-    _allocator.construct(item, d);
-    height = 1;
-    right = NULL;
-    left = NULL;
-    parent = par;
+  Node(T d, Node* par): item(d), height(1), left(NULL), parent(NULL), right(NULL) 
+  {
+  //  item =  _allocator.allocate(sizeof(T));
+  //   _allocator.construct(item, d);
+  //   height = 1;
+  //   right = NULL;
+  //   left = NULL;
+  //   parent = par;
   }
   ~Node()
   {
     // _allocator.destory(item);
-    _allocator.deallocate(item, sizeof(T));
+    // _allocator.deallocate(item, sizeof(T));
   }
 
   Node() {
@@ -49,8 +51,10 @@ struct AVLTree {
 	typedef typename value_type::second_type mapped_type;
 	// typedef std::allocator<T> Alloc;
   typedef Node<value_type, Alloc> Node;
+  typedef typename Alloc::template rebind<Node>::other  alloc_type;
   Node* root;
- 
+  comp _comp;
+  alloc_type _allocater;
   AVLTree()
   {
     root = NULL;
@@ -107,10 +111,15 @@ struct AVLTree {
   Node* insertNode(Node* node, Node* parent,T item) {
 
     if (node == NULL)
-      return (new Node(item, parent));
-    if ((item < *(node->item)))
+    {
+      node = _allocater.allocate(sizeof(Node));
+      _allocater.construct(node, Node(item, parent));
+      return node;
+    }
+      // return (new Node(item, parent));
+    if ((item < (node->item)))
       node->left = insertNode(node->left, node, item);
-    else if (item > *(node->item))
+    else if (item > (node->item))
       node->right = insertNode(node->right,node, item);
     else
       return node;
@@ -120,17 +129,17 @@ struct AVLTree {
     node->height = 1 + max(height(node->left), height(node->right));
     int balanceFactor = getBalanceFactor(node);
     if (balanceFactor > 1) {
-      if (item < *(node->left->item)) {
+      if (item < (node->left->item)) {
         return rightRotate(node);
-      } else if (item > *(node->left->item)) {
+      } else if (item > (node->left->item)) {
         node->left = leftRotate(node->left);
         return rightRotate(node);
       }
     }
     if (balanceFactor < -1) {
-      if (item > *(node->right->item)) {
+      if (item > (node->right->item)) {
         return leftRotate(node);
-      } else if (item < *(node->right->item)) {
+      } else if (item < (node->right->item)) {
         node->right = rightRotate(node->right);
         return leftRotate(node);
       }
@@ -160,10 +169,16 @@ struct AVLTree {
 
     // Find the node to be deleted and remove it
     if (root == NULL)
-      return new Node();
-    if (item < *(root->item))
+    {
+      root = _allocater.allocate(sizeof(Node));
+      _allocater.construct(root, Node());
+      return root;
+
+    }
+      // return new Node();
+    if (item < (root->item))
       root->left = deleteNode(root->left, item);
-    else if (item > *(root->item))
+    else if (item > (root->item))
       root->right = deleteNode(root->right, item);
     else {
       if ((root->left == NULL) || (root->right == NULL)) {
@@ -176,12 +191,17 @@ struct AVLTree {
           temp = root;
           root = NULL;
         } else
-          *root = *temp;
-          delete temp;
+          {
+            *root = *temp;
+            _allocater.destroy(temp);
+            _allocater.deallcate(temp, sizeof(Node));
+          // delete temp;
+            }
+
       } else {
         Node* temp = nodeWithMimumValue(root->right);
         root->item = temp->item;
-        root->right = deleteNode(root->right, *(temp->item));
+        root->right = deleteNode(root->right, (temp->item));
       }
     }
     if (root == NULL)
@@ -213,31 +233,152 @@ struct AVLTree {
     return root;
   }
 
-  void printTree(Node* currPtr, std::string indent, bool last) {
-    if (currPtr != nullptr) {
-      std::cout << indent ;
-      if (last) {
-      std::cout << "R----";
-        indent += "   ";
-      } else {
-        std::cout << "L---- ";
-        indent += "|  ";
+  // void printTree(Node* currPtr, std::string indent, bool last) {
+  //   if (currPtr != nullptr) {
+  //     std::cout << indent ;
+  //     if (last) {
+  //     std::cout << "R----";
+  //       indent += "   ";
+  //     } else {
+  //       std::cout << "L---- ";
+  //       indent += "|  ";
+  //     }
+  //     std::cout << (currPtr->item) << std::endl;
+  //     printTree(currPtr->left, indent, false);
+  //     printTree(currPtr->right, indent, true);
+  //   }
+  // }
+/*****************************************/
+Node* current_node(){return this->root;} 
+
+Node* inorder_Sec(Node *nodePtr)
+{
+   Node *p;
+  //  Node *
+    if (nodePtr == NULL)
+    {
+      // ++ from end(). get the root of the tree
+      nodePtr = this->root;
+      
+      // error! ++ requested for an empty tree
+      // if (nodePtr == nullptr)
+      //   throw UnderflowException { };
+      
+      // move to the smallest value in the tree,
+      // which is the first node inorder
+      while (nodePtr->left != NULL) {
+        nodePtr = nodePtr->left;
       }
-      std::cout << *(currPtr->item) << std::endl;
-      printTree(currPtr->left, indent, false);
-      printTree(currPtr->right, indent, true);
     }
+  else
+  {
+
+    if (nodePtr->right != NULL)
+      {
+        // successor is the farthest left node of
+        // right subtree
+        nodePtr = nodePtr->right;
+        
+        while (nodePtr->left != NULL) {
+          nodePtr = nodePtr->left;
+        }
+      }
+    else
+      {
+        // have already processed the left subtree, and
+        // there is no right subtree. move up the tree,
+        // looking for a parent for which nodePtr is a left child,
+        // stopping if the parent becomes NULL. a non-NULL parent
+        // is the successor. if parent is NULL, the original node
+        // was the last node inorder, and its successor
+        // is the end of the list
+        p = nodePtr->parent;
+        while (p != NULL && nodePtr == p->right)
+          {
+            nodePtr = p;
+            p = p->parent;
+          }
+        
+        // if we were previously at the right-most node in
+        // the tree, nodePtr = nullptr, and the iterator specifies
+        // the end of the list
+        nodePtr = p;
+      }
   }
-  void printpreorder(
-	Node* root)
+  
+  return nodePtr;
+}
+
+Node* inorder_Pre(Node *nodePtr)
+{
+   Node *p;
+  //  Node *
+    if (nodePtr == NULL)
+    {
+      // ++ from end(). get the root of the tree
+      nodePtr = this->root;
+      
+      // error! ++ requested for an empty tree
+      // if (nodePtr == nullptr)
+      //   throw UnderflowException { };
+      
+      // move to the smallest value in the tree,
+      // which is the first node inorder
+      while (nodePtr->right != NULL) {
+        nodePtr = nodePtr->right;
+      }
+    }
+  else
+  {
+
+    if (nodePtr->left != NULL)
+      {
+        // successor is the farthest left node of
+        // right subtree
+        nodePtr = nodePtr->left;
+        
+        while (nodePtr->right != NULL) {
+          nodePtr = nodePtr->right;
+        }
+      }
+    else
+      {
+        // have already processed the left subtree, and
+        // there is no right subtree. move up the tree,
+        // looking for a parent for which nodePtr is a left child,
+        // stopping if the parent becomes NULL. a non-NULL parent
+        // is the successor. if parent is NULL, the original node
+        // was the last node inorder, and its successor
+        // is the end of the list
+        p = nodePtr->parent;
+        while (p != NULL && nodePtr == p->left)
+          {
+            nodePtr = p;
+            p = p->parent;
+          }
+        
+        // if we were previously at the right-most node in
+        // the tree, nodePtr = nullptr, and the iterator specifies
+        // the end of the list
+        nodePtr = p;
+      }
+  }
+  
+  return nodePtr;
+}
+/*****************************************/
+
+
+
+  void printpreorder(Node* root)
 {
 	// Print the node's value along
 	// with its parent value
-	std::cout << "Node: " << *(root->item)
+	std::cout << "Node: " << (root->item)
 		<< ", Parent Node: ";
 
 	if (root->parent != NULL)
-		std::cout << *(root->parent->item) << std::endl;
+		std::cout << (root->parent->item) << std::endl;
 	else
 		std::cout << "NULL" << std::endl;
 

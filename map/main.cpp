@@ -31,9 +31,18 @@ int main() {
     tree.root = tree.insertNode(tree.root,NULL ,e);
     tree.root = tree.insertNode(tree.root,NULL ,j);
     tree.root = tree.insertNode(tree.root,NULL ,k);
-    
-
-    tree.printpreorder(tree.root);
+    Node<ft::pair <int,char> ,std::allocator<ft::pair<int, char> > > *root = NULL;
+    root = tree.inorder_Pre(root);
+    std::cout << root->item<< std::endl;
+    root = tree.inorder_Pre(root);
+    std::cout << root->item<< std::endl;
+    // root = tree.inorder_Sec(root);
+    // std::cout << root->item<< std::endl;
+    // root = tree.inorder_Sec(root);
+    // std::cout << root->item<< std::endl;
+    // root = tree.inorder_Sec(root);
+    // std::cout << root->item<< std::endl;
+    // tree.printpreorder(tree.root);
 
 
 
