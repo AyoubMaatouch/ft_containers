@@ -1,7 +1,7 @@
 // TO_DO 
 /***
- * replace new with allocate
- * and replace comparision with alloc
+ * 
+ * remember to remove .first when you implement the map
  * 
  * */
 #pragma once
@@ -18,35 +18,17 @@ struct Node {
   Node<T, Alloc>* right;
   Alloc _allocator;
 
-  Node(T d, Node* par): item(d), height(1), left(NULL), parent(NULL), right(NULL) 
-  {
-  //  item =  _allocator.allocate(sizeof(T));
-  //   _allocator.construct(item, d);
-  //   height = 1;
-  //   right = NULL;
-  //   left = NULL;
-  //   parent = par;
-  }
-  ~Node()
-  {
-    // _allocator.destory(item);
-    // _allocator.deallocate(item, sizeof(T));
-  }
+  Node(T d, Node* par): item(d), height(1), left(NULL), parent(NULL), right(NULL) {}
 
-  Node() {
-    item = 0;
-    height = 0;
-    left = NULL;
-    right = NULL;
-    parent = NULL;
-  }
+  Node() :  item(), height(0), left(NULL), parent(NULL), right(NULL) {}
+
 };
 
 // Tree class
 template <class T, class Compare, class Alloc> // class Alloc
 struct AVLTree {
-  typedef Compare comp;
   typedef T value_type;
+  typedef Compare comp;
   typedef typename value_type::first_type key_type;
 	typedef typename value_type::second_type mapped_type;
 	// typedef std::allocator<T> Alloc;
@@ -55,10 +37,12 @@ struct AVLTree {
   Node* root;
   comp _comp;
   alloc_type _allocater;
+
   AVLTree()
   {
     root = NULL;
-  } 
+  }
+  
   int height(Node* N) {
     if (N == NULL)
       return 0;
@@ -117,9 +101,9 @@ struct AVLTree {
       return node;
     }
       // return (new Node(item, parent));
-    if ((item < (node->item)))
+    if (_comp(item.first , (node->item.first)))
       node->left = insertNode(node->left, node, item);
-    else if (item > (node->item))
+    else if (_comp(node->item.first, item.first))//(item > (node->item))
       node->right = insertNode(node->right,node, item);
     else
       return node;
@@ -129,17 +113,22 @@ struct AVLTree {
     node->height = 1 + max(height(node->left), height(node->right));
     int balanceFactor = getBalanceFactor(node);
     if (balanceFactor > 1) {
-      if (item < (node->left->item)) {
+      if (_comp(item.first, node->left->item.first))//(item < (node->left->item)) 
+      {
         return rightRotate(node);
-      } else if (item > (node->left->item)) {
+      } else if (_comp(node->left->item.first, item.first))//(item > (node->left->item)) 
+      {
         node->left = leftRotate(node->left);
         return rightRotate(node);
       }
     }
     if (balanceFactor < -1) {
-      if (item > (node->right->item)) {
+      if (_comp(node->right->item.first, item.first))//(item > (node->right->item)) 
+      {
         return leftRotate(node);
-      } else if (item < (node->right->item)) {
+      } 
+      else if (_comp(item.first, node->right->item.first)) //(item < (node->right->item)) 
+      {
         node->right = rightRotate(node->right);
         return leftRotate(node);
       }
@@ -157,12 +146,12 @@ struct AVLTree {
       current = current->left;
     return current;
   }
-  // Node* nodeWithMaxValue(Node* node) {
-  //   Node* current = node;
-  //   while (current->right != NULL)
-  //     current = current->right;
-  //   return current;
-  // }
+  Node* nodeWithMaxValue(Node* node) {
+    Node* current = node;
+    while (current->right != NULL)
+      current = current->right;
+    return current;
+  }
 
   // Delete a node
   Node* deleteNode(Node* root, T item) {
@@ -175,8 +164,7 @@ struct AVLTree {
       return root;
 
     }
-      // return new Node();
-    if (item < (root->item))
+    if (_comp(item , (root->item)))
       root->left = deleteNode(root->left, item);
     else if (item > (root->item))
       root->right = deleteNode(root->right, item);
@@ -195,7 +183,6 @@ struct AVLTree {
             *root = *temp;
             _allocater.destroy(temp);
             _allocater.deallcate(temp, sizeof(Node));
-          // delete temp;
             }
 
       } else {
@@ -233,39 +220,33 @@ struct AVLTree {
     return root;
   }
 
-  // void printTree(Node* currPtr, std::string indent, bool last) {
-  //   if (currPtr != nullptr) {
-  //     std::cout << indent ;
-  //     if (last) {
-  //     std::cout << "R----";
-  //       indent += "   ";
-  //     } else {
-  //       std::cout << "L---- ";
-  //       indent += "|  ";
-  //     }
-  //     std::cout << (currPtr->item) << std::endl;
-  //     printTree(currPtr->left, indent, false);
-  //     printTree(currPtr->right, indent, true);
-  //   }
-  // }
+  void printTree(Node* currPtr, std::string indent, bool last) {
+    if (currPtr != nullptr) {
+      std::cout << indent ;
+      if (last) {
+      std::cout << "R----";
+        indent += "   ";
+      } else {
+        std::cout << "L---- ";
+        indent += "|  ";
+      }
+      std::cout << (currPtr->item) << std::endl;
+      printTree(currPtr->left, indent, false);
+      printTree(currPtr->right, indent, true);
+    }
+  }
 /*****************************************/
 Node* current_node(){return this->root;} 
+/*****************************************/
 
 Node* inorder_Sec(Node *nodePtr)
 {
    Node *p;
-  //  Node *
     if (nodePtr == NULL)
     {
-      // ++ from end(). get the root of the tree
       nodePtr = this->root;
       
-      // error! ++ requested for an empty tree
-      // if (nodePtr == nullptr)
-      //   throw UnderflowException { };
-      
-      // move to the smallest value in the tree,
-      // which is the first node inorder
+
       while (nodePtr->left != NULL) {
         nodePtr = nodePtr->left;
       }
@@ -275,8 +256,6 @@ Node* inorder_Sec(Node *nodePtr)
 
     if (nodePtr->right != NULL)
       {
-        // successor is the farthest left node of
-        // right subtree
         nodePtr = nodePtr->right;
         
         while (nodePtr->left != NULL) {
@@ -285,23 +264,12 @@ Node* inorder_Sec(Node *nodePtr)
       }
     else
       {
-        // have already processed the left subtree, and
-        // there is no right subtree. move up the tree,
-        // looking for a parent for which nodePtr is a left child,
-        // stopping if the parent becomes NULL. a non-NULL parent
-        // is the successor. if parent is NULL, the original node
-        // was the last node inorder, and its successor
-        // is the end of the list
         p = nodePtr->parent;
         while (p != NULL && nodePtr == p->right)
           {
             nodePtr = p;
             p = p->parent;
           }
-        
-        // if we were previously at the right-most node in
-        // the tree, nodePtr = nullptr, and the iterator specifies
-        // the end of the list
         nodePtr = p;
       }
   }
@@ -315,15 +283,7 @@ Node* inorder_Pre(Node *nodePtr)
   //  Node *
     if (nodePtr == NULL)
     {
-      // ++ from end(). get the root of the tree
       nodePtr = this->root;
-      
-      // error! ++ requested for an empty tree
-      // if (nodePtr == nullptr)
-      //   throw UnderflowException { };
-      
-      // move to the smallest value in the tree,
-      // which is the first node inorder
       while (nodePtr->right != NULL) {
         nodePtr = nodePtr->right;
       }
@@ -333,8 +293,6 @@ Node* inorder_Pre(Node *nodePtr)
 
     if (nodePtr->left != NULL)
       {
-        // successor is the farthest left node of
-        // right subtree
         nodePtr = nodePtr->left;
         
         while (nodePtr->right != NULL) {
@@ -343,23 +301,12 @@ Node* inorder_Pre(Node *nodePtr)
       }
     else
       {
-        // have already processed the left subtree, and
-        // there is no right subtree. move up the tree,
-        // looking for a parent for which nodePtr is a left child,
-        // stopping if the parent becomes NULL. a non-NULL parent
-        // is the successor. if parent is NULL, the original node
-        // was the last node inorder, and its successor
-        // is the end of the list
         p = nodePtr->parent;
         while (p != NULL && nodePtr == p->left)
           {
             nodePtr = p;
             p = p->parent;
-          }
-        
-        // if we were previously at the right-most node in
-        // the tree, nodePtr = nullptr, and the iterator specifies
-        // the end of the list
+          }       
         nodePtr = p;
       }
   }

@@ -1,207 +1,148 @@
+#include "node.hpp"
 
-template <class T>
-class Iterator
-{
+template <typename Node, typename value_type>
+	class bd_iterator 
+ {
+	friend class AVLTree;
+	public:
+		// typedef NNode 								Node;
+		typedef value_type& 					reference;
+		typedef value_type* 					pointer;
+		typedef ptrdiff_t 						difference_type;
+		typedef std::bidirectional_iterator_tag iterator_category;
+	private:
+		// Node* __root;
+		Node* _root;
+		bool _last;
+	public:
+	bd_iterator() : _root() {}
+	bd_iterator(Node* x)  : _root(x), _last(false) {}
+	bd_iterator(Node* x, bool l)  : _root(x), _last(l) {}
+	// explicit bd_iterator(Iterator x) : _root(x._root) {}
 
-public :
-	typedef T	value_type;
-    typedef ptrdiff_t	difference_type;
-    typedef T*	pointer;
-    typedef T&	reference;
-	typedef typename std::random_access_iterator_tag iterator_category;
+	// template <class U> bd_iterator(const bd_iterator<U>& u) _root(u._root) {}
 
-private:
-	pointer ptr;
-
-public:
-
-	Iterator() : ptr() {}
-	Iterator(pointer p) : ptr(p) {}
-	template <typename S>
-	Iterator(const Iterator<S> &it) : ptr(it.base()) {}
-	template <typename S>
-	Iterator &operator=(const Iterator<S> &it)
+	reference operator*() const  { 
+		 if (_last)
+		 {
+			value_type *x;
+		 	return *x;
+		 }
+		return  _root->item;
+		}
+	pointer operator->() const { return &(operator*());}
+	bd_iterator& operator++()
 	{
-		ptr = it.base();
-		return *this;
-	}
-	template <typename S>
-	Iterator operator=(const Iterator<S> &it) const
-	{
-		Iterator i(it);
-		return i;
-	}
-	~Iterator() {}
-
-	// Compare operator
-	template <typename S>
-	bool operator==(const Iterator<S> &it)
-	{
-		return (this->ptr == it.base());
-	}
-	template <typename S>
-	bool operator!=(const Iterator<S> &it)
-	{
-		return (this->ptr != it.base());
 		
+		Node *p;
+    	if (_root->right != NULL)
+    	  {
+    	    _root = _root->right;
+	
+    	    while (_root->left != NULL) {
+    	      _root = _root->left;
+    	    }
+    	  }
+    	else
+    	  {
+    	    p = _root->parent;
+    	    while (p != NULL && _root == p->right)
+    	      {
+    	        _root = p;
+    	        p = p->parent;
+    	      }
+    	    _root = p;
+    	  }
+  		return *this;
 	}
-	template <typename S>
-	bool operator<(const Iterator<S> &it)
+	bd_iterator operator++(int)
 	{
-		return (this->ptr < it.base());
-	}
-	template <typename S>
-	bool operator>(const Iterator<S> &it)
-	{
-		return (this->ptr > it.base());
-		
-	}
-	template <typename S>
-	bool operator>=(const Iterator<S> &it)
-	{
-		return (this->ptr >= it.base());
-	}
-	template <typename S>
-	bool operator<=(const Iterator<S> &it)
-	{
-		return (this->ptr <= it.base());
-	}
-	// // Overload Compare operators
-	template <typename S>
-	bool operator==(const Iterator<S> &it) const
-	{
-		return (this->ptr == it.base());
-	}
-	template <typename S>
-	bool operator!=(const Iterator<S> &it) const
-	{
-		return (this->ptr != it.base());
-	}
-	template <typename S>
-	bool operator<(const Iterator<S> &it) const
-	{
-		return (this->ptr < it.base());
-	}
-	template <typename S>
-	bool operator>(const Iterator<S> &it) const
-	{
-		return (this->ptr > it.base());
-	}
-	template <typename S>
-	bool operator>=(const Iterator<S> &it) const
-	{
-		return (this->ptr >= it.base());
-	}
-	template <typename S>
-	bool operator<=(const Iterator<S> &it) const
-	{
-		return (this->ptr <= it.base());
-	}
-
-	// Dereference
-	reference operator*() { return *ptr; }
-	reference operator*() const { return *ptr; }
-
-	void operator*(T ptr_val) { *ptr = ptr_val; }
-	pointer operator->() { return ptr; }
-	pointer operator->() const { return ptr; } // Needs correction
-	// increament operators post and pre
-	Iterator &operator++()
-	{
-		ptr++;
-		return *this;
-	} // pre
-	Iterator operator++(int)
-	{
-		Iterator tmp;
-		tmp = *this;
-		this->ptr++;
+		bd_iterator tmp(*this);
+		operator++();
 		return (tmp);
 	}
-	Iterator &operator--()
-	{
-		this->ptr--;
-		return *this;
-	}
-	Iterator operator--(int)
-	{
-		Iterator tmp;
-		tmp = *this;
-		this->ptr--;
-		return (tmp);
-	} // post
 
-	//arithmetic operation
-	Iterator operator+(difference_type n)
+	bd_iterator& operator--()
 	{
-		Iterator tmp = *this;
-		tmp += n;
-		return tmp;
-	}
-	const Iterator operator+(difference_type n) const
+	// Node *check = nodeWithMaxValue(_root);
+	// if (_last) // for end()
+	// {
+	// 	bd_iterator *tmp;
+	// 	std::cout << "hahaa" <<std::endl;
+	// 	this->_last = false;
+	// 	return *tmp;
+	// }
+	// else if ()
+	//  if (_root == NULL)
+    // {
+    //   _root = this->_root->parent;
+    // //   while (_root->right != NULL) {
+    // //     _root = _root->right;
+    // //   }
+    // }
+	// else
 	{
-		Iterator tmp = *this;
-		tmp += n;
-		return tmp;
-	}
-	Iterator operator-(difference_type n)
-	{
-		Iterator tmp = *this;
-		tmp -= n;
-		return tmp;
-	}
-	const Iterator operator-(difference_type n) const
-	{
-		Iterator tmp = *this;
-		tmp -= n;
-		return tmp;
-	}
-	template <typename S>
-	difference_type operator-(const Iterator<S> &it)
-	{
-		return ptr - it.base();
-	}
+	Node *p;
 
-	Iterator &operator+=(difference_type n)
-	{
-		ptr += n;
-		return (*this);
+    if (_root->left != NULL)
+      {
+        _root = _root->left;
+        
+        while (_root->right != NULL) {
+          _root = _root->right;
+        }
+      }
+    else
+      {
+        p = _root->parent;
+        while (p != NULL && _root == p->left)
+          {
+            _root = p;
+            p = p->parent;
+          }       
+        _root = p;
+      }
 	}
-	Iterator operator+=(difference_type n) const
-	{
-		Iterator iter = *this;
-		iter += n;
-		return (iter);
-	}
-	Iterator &operator-=(difference_type n)
-	{
-		ptr -= n;
-		return (*this);
-	}
-	Iterator operator-=(difference_type n) const
-	{
-		Iterator iter = *this;
-		iter -= n;
-		return (iter);
-	}
-	reference operator[](difference_type n)
-	{
-		return ptr[n];
-	}
-	const T& operator[](difference_type n) const
-	{
-		return ptr[n];
+  return *this;
+  
+  
 	}
 
-	const value_type*	base() const
+	bd_iterator operator--(int)
 	{
-		return ptr;
+		bd_iterator tmp (*this);
+		operator--();
+		return tmp;
 	}
-	value_type*	base()
+
+	// template <typename S>
+	// bool operator==(const bd_iterator<S>& it) const
+	// {
+		// return (_root == it._root);
+	// }
+	template <typename S,typename V>
+	bool operator!=(const bd_iterator<S, V>& it) const
 	{
-		return ptr;
+		return (_root != it._root);
 	}
+	// template <typename S>
+	// bool operator>(const bd_iterator<S>& it) const
+	// {
+		// return (_root > it._root);
+	// }
+	// template <typename S>
+	// bool operator<(const bd_iterator<S>& it) const
+	// {
+		// return (_root < it._root);
+	// }
+	// template <typename S>
+	// bool operator<=(const bd_iterator<S>& it) const
+	// {
+		// return (_root <= it._root) ;
+	// }
+	// template <typename S>
+	// bool operator>=(const bd_iterator<S>& it) const
+	// {
+		// return (_root >= it._root);
+	// }
 };
-template<class T>
-Iterator<T> operator+( size_t n, Iterator<T> it) { Iterator<T> tmp = it; return tmp + n; }
-
