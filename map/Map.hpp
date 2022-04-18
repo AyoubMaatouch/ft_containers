@@ -17,7 +17,7 @@ namespace ft
     // types:
     typedef Key key_type;
     typedef T mapped_type;
-    typedef pair<Key, T> value_type;
+    typedef pair<const Key, T> value_type;
     typedef Compare key_compare;
     typedef Allocator allocator_type;
     typedef typename Allocator::reference reference;
@@ -46,28 +46,9 @@ namespace ft
       }
     };
     // 23.3.1.1 construct/copy/destroy:
-    // explicit map(const Compare &comp = Compare(),
-                //  const Allocator & = Allocator()): _tree(), _size() {}
-    map(): _tree(), _size(), _allocator()
-    {
-      value_type a = make_pair (1,'a');
-      value_type b = make_pair (2,'b');
-      value_type c = make_pair (3,'c');
-      value_type d = make_pair (4,'d');
-      value_type f = make_pair (5,'f');
-      value_type e = make_pair (6,'e');
-      value_type j = make_pair (7,'j');
-      value_type k = make_pair (8,'k');
-      _tree.root = _tree.insertNode(_tree.root,NULL ,a);
-      _tree.root = _tree.insertNode(_tree.root,NULL ,b);
-      _tree.root = _tree.insertNode(_tree.root,NULL ,c);
-      _tree.root = _tree.insertNode(_tree.root,NULL ,d);
-      _tree.root = _tree.insertNode(_tree.root,NULL ,f);
-      _tree.root = _tree.insertNode(_tree.root,NULL ,e);
-      _tree.root = _tree.insertNode(_tree.root,NULL ,j);
-      _tree.root = _tree.insertNode(_tree.root,NULL ,k);
-
-    }
+    explicit map(const Compare &comp = Compare(),
+                 const Allocator & = Allocator()): _tree(), _size() {}
+  
     template <class InputIterator>
     map(InputIterator first, InputIterator last,
         const Compare &comp = Compare(), const Allocator & = Allocator()) : _tree(), _size(0)
@@ -83,25 +64,43 @@ namespace ft
     // ~map();
     map<Key, T, Compare, Allocator> &operator=(const map<Key, T, Compare, Allocator> &x);
    
-    iterator begin() { return iterator(_tree.nodeWithMimumValue(_tree.root)); }
-    // const_iterator begin() const { return const_iterator(_tree.nodeWithMimumValue(_tree.root)); }
-    iterator end() { return iterator((_tree.nodeWithMaxValue(_tree.root))->left, true);}
-    const_iterator end() const;
-    reverse_iterator rbegin();
-    const_reverse_iterator rbegin() const;
-    // reverse_iterator rend () { return reverse_iterator(iterator(_tree.nodeWithMimumValue(_tree.root))); }
-    // const_reverse_iterator rend() const{ return const_reverse_iterator(const_iterator(_tree.nodeWithMimumValue(_tree.root))); }
+    iterator begin() { 
+      return iterator(_tree.nodeWithMimumValue(_tree.root)); }
+    const_iterator begin() const { 
+      return const_iterator(_tree.nodeWithMimumValue(_tree.root)); }
+    iterator end() { 
+       return iterator((_tree.nodeWithMaxValue(_tree.root))->right);
+       }
+    const_iterator end() const
+    {
+      return const_iterator((_tree.nodeWithMaxValue(_tree.root))->right);
+    }
+    reverse_iterator rbegin()
+    {
+      return reverse_iterator(end());
+    }
+    const_reverse_iterator rbegin() const
+    {
+      return const_reverse_iterator(end());
+    }
+    reverse_iterator rend () { 
+      return reverse_iterator(begin()); }
+    const_reverse_iterator rend() const{ 
+      return const_reverse_iterator(begin()); 
+      }
     // capacity:
-    bool empty() const;
+    bool empty() const { return !(size() > 0); }
     size_type size() const { return _size; }
     size_type max_size() const { _allocator.max_size(); }
     // element access:
     T &operator[](const key_type &x);
     // modifiers:
-    // pair<iterator, bool> insert(const value_type &x);
-    void insert(const value_type &x)
+    pair<iterator, bool> insert(const value_type &x);
     {
-      // _tree.root = _tree.insertNode(_tree.root, NULL, x);
+      // find return position if not insert and 
+      // return pair true and with new postion for it
+      // if (find(v))
+      _tree.root = _tree.insertNode(_tree.root, NULL, x);
     }
     iterator insert(iterator position, const value_type &x);
     template <class InputIterator>
@@ -111,19 +110,37 @@ namespace ft
     void erase(iterator first, iterator last);
     void swap(map<Key, T, Compare, Allocator> &);
     void clear();
-    // key_compare key_comp() const {return  key_compare; }
-    // value_compare value_comp() const { return _vcompare;}
-    iterator find(const key_type &x);
-    const_iterator find(const key_type &x) const;
+    key_compare key_comp() const {return  key_compare(); }
+    value_compare value_comp() const { return value_compare();}
+    iterator find(const key_type &x)
+    {
+      iterator be = begin();
+      iterator ed = end();
+      for (; be != ed; be++)
+      {
+          if (be->first == x)
+            return (be);
+      }
+      return ed;
+    }
+    const_iterator find(const key_type &x) const
+    {
+      const_iterator be = begin();
+      const_iterator ed = end();
+      for (; be != ed; be++)
+      {
+          if (be->first == x)
+            return (be);
+      }
+      return ed;
+    }
     size_type count(const key_type &x) const;
     iterator lower_bound(const key_type &x);
     const_iterator lower_bound(const key_type &x) const;
     iterator upper_bound(const key_type &x);
     const_iterator upper_bound(const key_type &x) const;
-    pair<iterator, iterator>
-    equal_range(const key_type &x);
-    pair<const_iterator, const_iterator>
-    equal_range(const key_type &x) const;
+    pair<iterator, iterator> equal_range(const key_type &x);
+    pair<const_iterator, const_iterator> equal_range(const key_type &x) const;
     private:
       AVLTree<value_type, Compare, allocator_type> _tree;
       size_type       _size;

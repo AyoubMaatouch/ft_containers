@@ -52,6 +52,7 @@ struct AVLTree {
   int max(int a, int b) {
     return (a > b) ? a : b;
   }
+  
   void parent_correction(Node *&n, Node *p)
 		{
 			if (!n)
@@ -150,6 +151,11 @@ struct AVLTree {
     Node* current = node;
     while (current->right != NULL)
       current = current->right;
+    current->right = _allocater.allocate(sizeof(Node));
+    // current->right = _allocater.allocate(sizeof(Node));
+    _allocater.construct(current->right, Node());
+    current->right->parent = current;
+    // current->left->parent = current;
     return current;
   }
 
@@ -162,7 +168,6 @@ struct AVLTree {
       root = _allocater.allocate(sizeof(Node));
       _allocater.construct(root, Node());
       return root;
-
     }
     if (_comp(item , (root->item)))
       root->left = deleteNode(root->left, item);
@@ -339,4 +344,5 @@ Node* inorder_Pre(Node *nodePtr)
 		printpreorder(root->right);
 	}
 }
+
 };
