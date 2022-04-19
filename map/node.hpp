@@ -158,6 +158,19 @@ struct AVLTree {
     // current->left->parent = current;
     return current;
   }
+  // search Node
+  Node* searchNode(Node* root, int key)
+{
+    if (!root)
+        return NULL;
+    if (root->key == key)
+        return root;
+
+    Node *right = (searchNode(root->right, key));
+        if (right)
+            return right;
+    return searchNode(root->left, key);
+}
 
   // Delete a node
   Node* deleteNode(Node* root, T item) {

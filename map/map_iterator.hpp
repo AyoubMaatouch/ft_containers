@@ -3,7 +3,6 @@
 template <typename Node, typename value_type>
 class bd_iterator
 {
-	friend class AVLTree;
 
 public:
 
@@ -20,16 +19,9 @@ private:
 public:
 	bd_iterator() : _root() {}
 	bd_iterator(Node *x) : _root(x), _last(false) {}
-	// bd_iterator(Node *x, bool l) : _root(x), _last(l) {}
-
 
 	reference operator*() const
 	{
-		// if (_last)
-		// {
-		// 	value_type *x;
-		// 	return *x;
-		// }
 		return _root->item;
 	}
 	pointer operator->() const { return &(operator*()); }

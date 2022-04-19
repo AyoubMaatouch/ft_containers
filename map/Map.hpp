@@ -69,7 +69,7 @@ namespace ft
     const_iterator begin() const { 
       return const_iterator(_tree.nodeWithMimumValue(_tree.root)); }
     iterator end() { 
-       return iterator((_tree.nodeWithMaxValue(_tree.root))->right);
+       return iterator((_tree.nodeWithMaxValue(_tree.root)->right));
        }
     const_iterator end() const
     {
@@ -95,12 +95,17 @@ namespace ft
     // element access:
     T &operator[](const key_type &x);
     // modifiers:
-    pair<iterator, bool> insert(const value_type &x);
+    ft::pair<iterator, bool> insert(const value_type &x)
     {
-      // find return position if not insert and 
-      // return pair true and with new postion for it
-      // if (find(v))
-      _tree.root = _tree.insertNode(_tree.root, NULL, x);
+      //fix the end() problem with regarding right allocation
+      // if ( !_size || find(x.first) == end())
+      //   {
+          _size++;
+          _tree.root = _tree.insertNode(_tree.root, NULL, x);
+          return (ft::make_pair(find(x.first), false));    
+        // }
+        // return (ft::make_pair(find(x.first), false));
+
     }
     iterator insert(iterator position, const value_type &x);
     template <class InputIterator>
@@ -115,25 +120,26 @@ namespace ft
     iterator find(const key_type &x)
     {
       iterator be = begin();
-      iterator ed = end();
-      for (; be != ed; be++)
+      // iterator ed = end();
+      for (size_t i = 0; i < _size; i++)
       {
           if (be->first == x)
             return (be);
+          be++;
       }
-      return ed;
+      return end();
     }
-    const_iterator find(const key_type &x) const
-    {
-      const_iterator be = begin();
-      const_iterator ed = end();
-      for (; be != ed; be++)
-      {
-          if (be->first == x)
-            return (be);
-      }
-      return ed;
-    }
+    // const_iterator find(const key_type &x) const
+    // {
+    //   const_iterator be = begin();
+    //   const_iterator ed = end();
+    //   for (; be != ed; be++)
+    //   {
+    //       if (be->first == x)
+    //         return (be);
+    //   }
+    //   return ed;
+    // }
     size_type count(const key_type &x) const;
     iterator lower_bound(const key_type &x);
     const_iterator lower_bound(const key_type &x) const;
