@@ -1,40 +1,56 @@
-// TO_DO 
+// TO_DO
 /***
- * 
+ *
  * remember to remove .first when you implement the map
- * 
+ *
  * */
 #pragma once
-#include <iostream> 
-#include <memory> 
+#include <iostream>
+#include <memory>
 #include "pair.hpp"
 // Create node
 template <class T, class Alloc>
-struct Node {
-  T item; 
+struct Node
+{
+  T item;
   int height;
-  Node<T, Alloc>* left;
-  Node<T, Alloc>* parent;
-  Node<T, Alloc>* right;
+  Node<T, Alloc> *left;
+  Node<T, Alloc> *parent;
+  Node<T, Alloc> *right;
   Alloc _allocator;
 
-  Node(T d, Node* par): item(d), height(1), left(NULL), parent(NULL), right(NULL) {}
+  Node(T d, Node *par) : item(d), height(1), left(NULL), parent(par), right(NULL) {}
 
-  Node() :  item(), height(0), left(NULL), parent(NULL), right(NULL) {}
+  Node() : height(0), left(NULL), parent(NULL), right(NULL) {}
 
+  Node(Node const & x) :item(x.item) ,height(x.height), left(x.left), parent(x.parent), right(x.right) {}
+  Node(Node const & x, T i) :item(i) ,height(x.height), left(x.left), parent(x.parent), right(x.right) {}
+
+  //   Node<T, Alloc> &operator=(const Node<T, Alloc> &x)
+  // {
+  //   item = x.item;
+  //   height = x.height;
+  //   left = x.left;
+  //   parent = x.parent;
+  //   right = x.right;
+  //   _allocator = x._allocator;
+
+  //   return *this;
+  // }
 };
 
 // Tree class
 template <class T, class Compare, class Alloc> // class Alloc
-struct AVLTree {
+struct AVLTree
+{
   typedef T value_type;
   typedef Compare comp;
   typedef typename value_type::first_type key_type;
-	typedef typename value_type::second_type mapped_type;
-	// typedef std::allocator<T> Alloc;
+  typedef typename value_type::second_type mapped_type;
+  // typedef std::allocator<T> Alloc;
   typedef Node<value_type, Alloc> Node;
-  typedef typename Alloc::template rebind<Node>::other  alloc_type;
-  Node* root;
+  typedef typename Alloc::template rebind<Node>::other alloc_type;
+  Node *root;
   comp _comp;
   alloc_type _allocater;
 
@@ -42,29 +58,32 @@ struct AVLTree {
   {
     root = NULL;
   }
-  
-  int height(Node* N) {
+
+  int height(Node *N)
+  {
     if (N == NULL)
       return 0;
     return N->height;
   }
 
-  int max(int a, int b) {
+  int max(int a, int b)
+  {
     return (a > b) ? a : b;
   }
-  
-  void parent_correction(Node *&n, Node *p)
-		{
-			if (!n)
-				return ;
-			parent_correction(n->right, n);
-			n->parent = p;
-			parent_correction(n->left, n);
-		}
 
-  Node* rightRotate(Node* y) {
-    Node* x =  y->left;
-    Node* T2 = x->right;
+  void parent_correction(Node *&n, Node *p)
+  {
+    if (!n)
+      return;
+    parent_correction(n->right, n);
+    n->parent = p;
+    parent_correction(n->left, n);
+  }
+
+  Node *rightRotate(Node *y)
+  {
+    Node *x = y->left;
+    Node *T2 = x->right;
     x->right = y;
     y->left = T2;
     parent_correction(y, x->parent);
@@ -73,9 +92,10 @@ struct AVLTree {
     return x;
   }
 
-  Node* leftRotate(Node* x) {
-    Node* y = x->right;
-    Node* T2 = y->left;
+  Node *leftRotate(Node *x)
+  {
+    Node *y = x->right;
+    Node *T2 = y->left;
 
     y->left = x;
     x->right = T2;
@@ -86,14 +106,15 @@ struct AVLTree {
   }
 
   // Get balance factor of a node
-  int getBalanceFactor(Node* N) {
+  int getBalanceFactor(Node *N)
+  {
     if (N == NULL)
       return 0;
     return height(N->left) - height(N->right);
   }
 
-
-  Node* insertNode(Node* node, Node* parent,T item) {
+  Node *insertNode(Node *node, Node *parent, T item)
+  {
 
     if (node == NULL)
     {
@@ -101,11 +122,11 @@ struct AVLTree {
       _allocater.construct(node, Node(item, parent));
       return node;
     }
-      // return (new Node(item, parent));
-    if (_comp(item.first , (node->item.first)))
+    // return (new Node(item, parent));
+    if (_comp(item.first, (node->item.first)))
       node->left = insertNode(node->left, node, item);
-    else if (_comp(node->item.first, item.first))//(item > (node->item))
-      node->right = insertNode(node->right,node, item);
+    else if (_comp(node->item.first, item.first)) //(item > (node->item))
+      node->right = insertNode(node->right, node, item);
     else
       return node;
 
@@ -113,67 +134,81 @@ struct AVLTree {
     // And, balance the tree
     node->height = 1 + max(height(node->left), height(node->right));
     int balanceFactor = getBalanceFactor(node);
-    if (balanceFactor > 1) {
-      if (_comp(item.first, node->left->item.first))//(item < (node->left->item)) 
+    if (balanceFactor > 1)
+    {
+      if (_comp(item.first, node->left->item.first)) //(item < (node->left->item))
       {
         return rightRotate(node);
-      } else if (_comp(node->left->item.first, item.first))//(item > (node->left->item)) 
+      }
+      else if (_comp(node->left->item.first, item.first)) //(item > (node->left->item))
       {
         node->left = leftRotate(node->left);
         return rightRotate(node);
       }
     }
-    if (balanceFactor < -1) {
-      if (_comp(node->right->item.first, item.first))//(item > (node->right->item)) 
+    if (balanceFactor < -1)
+    {
+      if (_comp(node->right->item.first, item.first)) //(item > (node->right->item))
       {
         return leftRotate(node);
-      } 
-      else if (_comp(item.first, node->right->item.first)) //(item < (node->right->item)) 
+      }
+      else if (_comp(item.first, node->right->item.first)) //(item < (node->right->item))
       {
         node->right = rightRotate(node->right);
         return leftRotate(node);
       }
     }
     if (node->left)
-				node->left->parent = node;
-		if (node->right)
-				node->right->parent = node;
+      node->left->parent = node;
+    if (node->right)
+      node->right->parent = node;
     return node;
   }
 
-  Node* nodeWithMimumValue(Node* node) {
-    Node* current = node;
+  Node *nodeWithMimumValue(Node *node)
+  {
+    Node *current = node;
     while (current->left != NULL)
       current = current->left;
     return current;
   }
-  Node* nodeWithMaxValue(Node* node) {
-    Node* current = node;
+  Node *nodeWithMaxValue(Node *node)
+  {
+    Node *current = node;
     while (current->right != NULL)
       current = current->right;
-    current->right = _allocater.allocate(sizeof(Node));
-    // current->right = _allocater.allocate(sizeof(Node));
-    _allocater.construct(current->right, Node());
-    current->right->parent = current;
-    // current->left->parent = current;
+    current->right = NULL;
     return current;
   }
   // search Node
-  Node* searchNode(Node* root, int key)
-{
+  Node *searchNode(Node *root, key_type key)
+  {
     if (!root)
-        return NULL;
-    if (root->key == key)
-        return root;
+      return NULL;
+    if (root->item.first == key)
+      return root;
 
     Node *right = (searchNode(root->right, key));
-        if (right)
-            return right;
+    if (right)
+      return right;
     return searchNode(root->left, key);
-}
+  }
+  void removeAll(Node *root)
+  {
+    if (!root)
+      return;
+    removeAll(root->right);
+    removeAll(root->left);
+    if (root)
+    {
+      _allocater.destroy(root);
+      _allocater.deallocate(root, sizeof(Node));
+    }
+  }
 
   // Delete a node
-  Node* deleteNode(Node* root, T item) {
+  Node *deleteNode(Node *root, key_type item)
+  {
 
     // Find the node to be deleted and remove it
     if (root == NULL)
@@ -182,31 +217,48 @@ struct AVLTree {
       _allocater.construct(root, Node());
       return root;
     }
-    if (_comp(item , (root->item)))
+    if (_comp(item, (root->item).first))
       root->left = deleteNode(root->left, item);
-    else if (item > (root->item))
+    else if (_comp((root->item).first, item))
       root->right = deleteNode(root->right, item);
-    else {
-      if ((root->left == NULL) || (root->right == NULL)) {
-        Node* temp = NULL;
+    else
+    {
+      if ((root->left == NULL) || (root->right == NULL))
+      {
+        Node *temp = NULL;
         if (temp == root->left)
           temp = root->right;
         else
           temp = root->left;
-        if (temp == NULL) {
+        if (temp == NULL)
+        {
           temp = root;
           root = NULL;
-        } else
-          {
-            *root = *temp;
-            _allocater.destroy(temp);
-            _allocater.deallcate(temp, sizeof(Node));
-            }
-
-      } else {
-        Node* temp = nodeWithMimumValue(root->right);
-        root->item = temp->item;
-        root->right = deleteNode(root->right, (temp->item));
+        }
+        else
+        {
+          // _allocater.(roo)
+          // root =  temp;
+          _allocater.destroy(root);
+          _allocater.deallocate(root, sizeof(Node));
+          root = _allocater.allocate(sizeof(Node));
+         _allocater.construct(root, *temp);
+          _allocater.destroy(temp);
+          _allocater.deallocate(temp, sizeof(Node));
+        }
+      }
+      else
+      {
+        Node *temp = nodeWithMimumValue(root->right);
+        Node *hold = _allocater.allocate(sizeof(Node));
+         _allocater.construct(hold, Node (*root, temp->item) );  
+         _allocater.destroy(root);
+          _allocater.deallocate(root, sizeof(Node));
+         root = _allocater.allocate(sizeof(Node));
+         _allocater.construct(root, *hold);
+          _allocater.destroy(hold);
+          _allocater.deallocate(hold, sizeof(Node));
+        root->right = deleteNode(root->right, item);
       }
     }
     if (root == NULL)
@@ -215,36 +267,49 @@ struct AVLTree {
     // Update the balance factor of each node and balance the tree
     root->height = max(height(root->left), height(root->right)) + 1;
     int balanceFactor = getBalanceFactor(root);
-    if (balanceFactor > 1) {
-      if (getBalanceFactor(root->left) >= 0) {
+    if (balanceFactor > 1)
+    {
+      if (getBalanceFactor(root->left) >= 0)
+      {
         return rightRotate(root);
-      } else {
+      }
+      else
+      {
         root->left = leftRotate(root->left);
         return rightRotate(root);
       }
     }
-    if (balanceFactor < -1) {
-      if (getBalanceFactor(root->right) <= 0) {
+    if (balanceFactor < -1)
+    {
+      if (getBalanceFactor(root->right) <= 0)
+      {
         return leftRotate(root);
-      } else {
+      }
+      else
+      {
         root->right = rightRotate(root->right);
         return leftRotate(root);
       }
     }
-     if (root->left)
-				root->left->parent = root;
-			if (root->right)
-				root->right->parent = root;
+    if (root->left)
+      root->left->parent = root;
+    if (root->right)
+      root->right->parent = root;
     return root;
   }
 
-  void printTree(Node* currPtr, std::string indent, bool last) {
-    if (currPtr != nullptr) {
-      std::cout << indent ;
-      if (last) {
-      std::cout << "R----";
+  void printTree(Node *currPtr, std::string indent, bool last)
+  {
+    if (currPtr != nullptr)
+    {
+      std::cout << indent;
+      if (last)
+      {
+        std::cout << "R----";
         indent += "   ";
-      } else {
+      }
+      else
+      {
         std::cout << "L---- ";
         indent += "|  ";
       }
@@ -253,109 +318,112 @@ struct AVLTree {
       printTree(currPtr->right, indent, true);
     }
   }
-/*****************************************/
-Node* current_node(){return this->root;} 
-/*****************************************/
+  // void
+  /*****************************************/
+  Node *current_node() { return this->root; }
+  /*****************************************/
 
-Node* inorder_Sec(Node *nodePtr)
-{
-   Node *p;
+  Node *inorder_Sec(Node *nodePtr)
+  {
+    Node *p;
     if (nodePtr == NULL)
     {
       nodePtr = this->root;
-      
 
-      while (nodePtr->left != NULL) {
+      while (nodePtr->left != NULL)
+      {
         nodePtr = nodePtr->left;
       }
     }
-  else
-  {
+    else
+    {
 
-    if (nodePtr->right != NULL)
+      if (nodePtr->right != NULL)
       {
         nodePtr = nodePtr->right;
-        
-        while (nodePtr->left != NULL) {
+
+        while (nodePtr->left != NULL)
+        {
           nodePtr = nodePtr->left;
         }
       }
-    else
+      else
       {
         p = nodePtr->parent;
         while (p != NULL && nodePtr == p->right)
-          {
-            nodePtr = p;
-            p = p->parent;
-          }
+        {
+          nodePtr = p;
+          p = p->parent;
+        }
         nodePtr = p;
       }
-  }
-  
-  return nodePtr;
-}
+    }
 
-Node* inorder_Pre(Node *nodePtr)
-{
-   Node *p;
-  //  Node *
+    return nodePtr;
+  }
+
+  Node *inorder_Pre(Node *nodePtr)
+  {
+    Node *p;
+    //  Node *
     if (nodePtr == NULL)
     {
       nodePtr = this->root;
-      while (nodePtr->right != NULL) {
+      while (nodePtr->right != NULL)
+      {
         nodePtr = nodePtr->right;
       }
     }
-  else
-  {
+    else
+    {
 
-    if (nodePtr->left != NULL)
+      if (nodePtr->left != NULL)
       {
         nodePtr = nodePtr->left;
-        
-        while (nodePtr->right != NULL) {
+
+        while (nodePtr->right != NULL)
+        {
           nodePtr = nodePtr->right;
         }
       }
-    else
+      else
       {
         p = nodePtr->parent;
         while (p != NULL && nodePtr == p->left)
-          {
-            nodePtr = p;
-            p = p->parent;
-          }       
+        {
+          nodePtr = p;
+          p = p->parent;
+        }
         nodePtr = p;
       }
+    }
+
+    return nodePtr;
   }
-  
-  return nodePtr;
-}
-/*****************************************/
+  /*****************************************/
 
+  void printpreorder(Node *root)
+  {
+    // Print the node's value along
+    // with its parent value
+    std::cout << "Node: " << (root->item)
+              << ", Parent Node: ";
 
+    if (root->parent != NULL)
+      std::cout << (root->parent->item) << std::endl;
+    else
+      std::cout << "NULL" << std::endl;
 
-  void printpreorder(Node* root)
-{
-	// Print the node's value along
-	// with its parent value
-	std::cout << "Node: " << (root->item)
-		<< ", Parent Node: ";
+    // Recur to the left subtree
+    if (root->left != NULL)
+    {
+      printpreorder(root->left);
+    }
 
-	if (root->parent != NULL)
-		std::cout << (root->parent->item) << std::endl;
-	else
-		std::cout << "NULL" << std::endl;
-
-	// Recur to the left subtree
-	if (root->left != NULL) {
-		printpreorder(root->left);
-	}
-
-	// Recur to the right subtree
-	if (root->right != NULL) {
-		printpreorder(root->right);
-	}
-}
-
+    // Recur to the right subtree
+    if (root->right != NULL)
+    {
+      printpreorder(root->right);
+    }
+  }
 };

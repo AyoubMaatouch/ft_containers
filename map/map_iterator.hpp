@@ -14,11 +14,10 @@ public:
 private:
 
 	Node *_root;
-	bool _last;
 
 public:
 	bd_iterator() : _root() {}
-	bd_iterator(Node *x) : _root(x), _last(false) {}
+	bd_iterator(Node *x) : _root(x) {}
 
 	reference operator*() const
 	{
