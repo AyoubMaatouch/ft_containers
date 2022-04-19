@@ -26,14 +26,15 @@ int main() {
      mmap.insert (ft::make_pair (5,'f'));
      mmap.insert (ft::make_pair (6,'e'));
      mmap.insert (ft::make_pair (7,'j'));
-    ft::map<int, char>::iterator it = mmap.begin();
+     mmap.insert (ft::make_pair (8,'k'));
+    ft::map<int ,char> x_mmap(mmap.begin(), mmap.end());
+    ft::map<int, char>::iterator it = x_mmap.begin();
     // it++;
     // ++it;
-     mmap.insert (ft::make_pair (8,'k'));
 
     
     // mymap.insert(a);
-    ft::map<int, char>::iterator en = mmap.end();
+    ft::map<int, char>::iterator en = x_mmap.end();
     
     for (; en != it; it++)
         std::cout << it->first << std::endl;

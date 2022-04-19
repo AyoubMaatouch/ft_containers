@@ -60,7 +60,7 @@ namespace ft
           }
         }
 
-    map(const map<Key, T, Compare, Allocator> &x) :_tree(x.tree), _size(x._size) {}
+    map(const map<Key, T, Compare, Allocator> &x) :_tree(x.tree), _size(x._size), _allocator(x._allocator) {}
     // ~map();
     map<Key, T, Compare, Allocator> &operator=(const map<Key, T, Compare, Allocator> &x);
    
@@ -129,18 +129,23 @@ namespace ft
       }
       return end();
     }
-    // const_iterator find(const key_type &x) const
-    // {
-    //   const_iterator be = begin();
-    //   const_iterator ed = end();
-    //   for (; be != ed; be++)
-    //   {
-    //       if (be->first == x)
-    //         return (be);
-    //   }
-    //   return ed;
-    // }
-    size_type count(const key_type &x) const;
+    const_iterator find(const key_type &x) const
+    {
+      const_iterator be = begin();
+      const_iterator ed = end();
+      for (; be != ed; be++)
+      {
+          if (be->first == x)
+            return (be);
+      }
+      return ed;
+    }
+    size_type count(const key_type &x) const
+    {
+      if (find(x) != end())
+        return(1)
+      return (0);
+    }
     iterator lower_bound(const key_type &x);
     const_iterator lower_bound(const key_type &x) const;
     iterator upper_bound(const key_type &x);
