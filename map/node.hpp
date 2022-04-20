@@ -23,8 +23,11 @@ struct Node
 
   Node() : height(0), left(NULL), parent(NULL), right(NULL) {}
 
-  Node(Node const & x) :item(x.item) ,height(x.height), left(x.left), parent(x.parent), right(x.right) {}
-  Node(Node const & x, T i) :item(i) ,height(x.height), left(x.left), parent(x.parent), right(x.right) {}
+  Node(Node const & x) :item(x.item) ,height(x.height), left(x.left), parent(), right(x.right) {
+    if (left || right)
+      parent = x.parent;
+  }
+  // Node(Node const & x, T i) :item(i) ,height(x.height), left(x.left), parent(x.parent), right(x.right) {}
 
   //   Node<T, Alloc> &operator=(const Node<T, Alloc> &x)
   // {
@@ -116,13 +119,13 @@ struct AVLTree
   Node *insertNode(Node *node, Node *parent, T item)
   {
 
+      // return (new Node(item, parent));
     if (node == NULL)
     {
       node = _allocater.allocate(sizeof(Node));
       _allocater.construct(node, Node(item, parent));
       return node;
     }
-    // return (new Node(item, parent));
     if (_comp(item.first, (node->item.first)))
       node->left = insertNode(node->left, node, item);
     else if (_comp(node->item.first, item.first)) //(item > (node->item))
@@ -165,20 +168,31 @@ struct AVLTree
     return node;
   }
 
-  Node *nodeWithMimumValue(Node *node)
+  Node *nodeWithMimumValue(Node *node) const
   {
+    if (node)
+    {
+
     Node *current = node;
     while (current->left != NULL)
       current = current->left;
     return current;
+    }
+    return NULL;
   }
-  Node *nodeWithMaxValue(Node *node)
+  Node *nodeWithMaxValue(Node *node) const
   {
+    if (node)
+    {
+
     Node *current = node;
     while (current->right != NULL)
       current = current->right;
     current->right = NULL;
     return current;
+    }
+
+    return NULL;
   }
   // search Node
   Node *searchNode(Node *root, key_type key)
@@ -193,10 +207,10 @@ struct AVLTree
       return right;
     return searchNode(root->left, key);
   }
-  void removeAll(Node *root)
+  Node* removeAll(Node *root)
   {
     if (!root)
-      return;
+      return NULL;
     removeAll(root->right);
     removeAll(root->left);
     if (root)
@@ -204,6 +218,7 @@ struct AVLTree
       _allocater.destroy(root);
       _allocater.deallocate(root, sizeof(Node));
     }
+    return NULL;
   }
 
   // Delete a node
@@ -212,11 +227,7 @@ struct AVLTree
 
     // Find the node to be deleted and remove it
     if (root == NULL)
-    {
-      root = _allocater.allocate(sizeof(Node));
-      _allocater.construct(root, Node());
-      return root;
-    }
+      return NULL;
     if (_comp(item, (root->item).first))
       root->left = deleteNode(root->left, item);
     else if (_comp((root->item).first, item))
@@ -237,28 +248,17 @@ struct AVLTree
         }
         else
         {
-          // _allocater.(roo)
-          // root =  temp;
           _allocater.destroy(root);
-          _allocater.deallocate(root, sizeof(Node));
-          root = _allocater.allocate(sizeof(Node));
-         _allocater.construct(root, *temp);
-          _allocater.destroy(temp);
+          _allocater.construct(root, *temp);
           _allocater.deallocate(temp, sizeof(Node));
+          temp = NULL;
         }
       }
       else
       {
         Node *temp = nodeWithMimumValue(root->right);
-        Node *hold = _allocater.allocate(sizeof(Node));
-         _allocater.construct(hold, Node (*root, temp->item) );  
-         _allocater.destroy(root);
-          _allocater.deallocate(root, sizeof(Node));
-         root = _allocater.allocate(sizeof(Node));
-         _allocater.construct(root, *hold);
-          _allocater.destroy(hold);
-          _allocater.deallocate(hold, sizeof(Node));
-        root->right = deleteNode(root->right, item);
+        root->item = temp->item;
+        root->right = deleteNode(root->right,  temp->item.first);
       }
     }
     if (root == NULL)
@@ -294,8 +294,9 @@ struct AVLTree
     if (root->left)
       root->left->parent = root;
     if (root->right)
-      root->right->parent = root;
+      root->right->parent = root; 
     return root;
+
   }
 
   void printTree(Node *currPtr, std::string indent, bool last)

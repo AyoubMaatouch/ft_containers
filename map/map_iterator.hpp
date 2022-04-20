@@ -1,11 +1,12 @@
 #include "node.hpp"
 
-template <typename Node, typename value_type>
+template <typename Node, typename value>
 class bd_iterator
 {
 
 public:
 
+	typedef value value_type;
 	typedef value_type &reference;
 	typedef value_type *pointer;
 	typedef ptrdiff_t difference_type;
