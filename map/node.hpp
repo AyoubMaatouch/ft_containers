@@ -23,23 +23,10 @@ struct Node
 
   Node() : height(0), left(NULL), parent(NULL), right(NULL) {}
 
-  Node(Node const & x) :item(x.item) ,height(x.height), left(x.left), parent(), right(x.right) {
-    if (left || right)
-      parent = x.parent;
+  Node(Node const & x) :item(x.item) ,height(x.height), left(x.left), parent(x.parent), right(x.right) {
+    // if (left || right)
+    //   parent = x.parent;
   }
-  // Node(Node const & x, T i) :item(i) ,height(x.height), left(x.left), parent(x.parent), right(x.right) {}
-
-  //   Node<T, Alloc> &operator=(const Node<T, Alloc> &x)
-  // {
-  //   item = x.item;
-  //   height = x.height;
-  //   left = x.left;
-  //   parent = x.parent;
-  //   right = x.right;
-  //   _allocator = x._allocator;
-
-  //   return *this;
-  // }
 };
 
 // Tree class

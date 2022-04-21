@@ -88,14 +88,14 @@ namespace ft
     }
     iterator end()
     {
-      if (_tree.root)
-        return iterator((_tree.nodeWithMaxValue(_tree.root)->right));
-      return iterator((_tree.nodeWithMaxValue(_tree.root)));
+      // if (_tree.root)
+        return iterator((_tree.nodeWithMaxValue(_tree.root)));
+      // return iterator((_tree.nodeWithMaxValue(_tree.root)));
     }
     const_iterator end() const
     {
-      if (_tree.root)
-        return const_iterator((_tree.nodeWithMaxValue(_tree.root))->right);
+      // if (_tree.root)
+        // return const_iterator((_tree.nodeWithMaxValue(_tree.root))->right);
       return const_iterator((_tree.nodeWithMaxValue(_tree.root)));
     }
     reverse_iterator rbegin()

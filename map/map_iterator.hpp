@@ -20,6 +20,10 @@ public:
 	bd_iterator() : _root() {}
 	bd_iterator(Node *x) : _root(x) {}
 
+	operator bd_iterator<const Node, const value> () const
+		{
+			return bd_iterator<const Node, const value> (_root);
+		}
 	reference operator*() const
 	{
 		return _root->item;
