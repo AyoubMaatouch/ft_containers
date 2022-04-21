@@ -12,20 +12,29 @@
 template <class T, class Alloc>
 struct Node
 {
-  T item;
+  T *item;
   int height;
   Node<T, Alloc> *left;
   Node<T, Alloc> *parent;
   Node<T, Alloc> *right;
   Alloc _allocator;
 
-  Node(T d, Node *par) : item(d), height(1), left(NULL), parent(par), right(NULL) {}
+  Node(T d, Node *par, Alloc _alloc) : height(1), left(NULL), parent(par), right(NULL), _allocator(_alloc)
+  {
+    item = _alloc.allocate(sizeof(T));
+    _alloc.construct(item, d);
+  }
 
   Node() : height(0), left(NULL), parent(NULL), right(NULL) {}
 
-  Node(Node const & x) :item(x.item) ,height(x.height), left(x.left), parent(x.parent), right(x.right) {
-    // if (left || right)
-    //   parent = x.parent;
+  // Node(Node const & x) :height(x.height), left(x.left), parent(x.parent), right(x.right) {
+  //   item = _alloc.allocate(sizeof(T));
+  //   _alloc.construct(item, x->item);
+  // }
+  ~Node()
+  {
+    // if (item)
+    //   _allocator.deallocate(item, sizeof(T));
   }
 };
 
@@ -42,7 +51,9 @@ struct AVLTree
   typedef typename Alloc::template rebind<Node>::other alloc_type;
   Node *root;
   comp _comp;
+  size_t _size;
   alloc_type _allocater;
+  alloc_type _reb;
 
   AVLTree()
   {
@@ -103,19 +114,20 @@ struct AVLTree
     return height(N->left) - height(N->right);
   }
 
+
   Node *insertNode(Node *node, Node *parent, T item)
   {
 
-      // return (new Node(item, parent));
+    // return (new Node(item, parent));
     if (node == NULL)
     {
       node = _allocater.allocate(sizeof(Node));
-      _allocater.construct(node, Node(item, parent));
+      _allocater.construct(node, Node(item, parent, _reb));
       return node;
     }
-    if (_comp(item.first, (node->item.first)))
+    if (_comp(item.first, (node->item->first)))
       node->left = insertNode(node->left, node, item);
-    else if (_comp(node->item.first, item.first)) //(item > (node->item))
+    else if (_comp(node->item->first, item.first)) //(item > (node->item))
       node->right = insertNode(node->right, node, item);
     else
       return node;
@@ -126,11 +138,11 @@ struct AVLTree
     int balanceFactor = getBalanceFactor(node);
     if (balanceFactor > 1)
     {
-      if (_comp(item.first, node->left->item.first)) //(item < (node->left->item))
+      if (_comp(item.first, node->left->item->first)) //(item < (node->left->item))
       {
         return rightRotate(node);
       }
-      else if (_comp(node->left->item.first, item.first)) //(item > (node->left->item))
+      else if (_comp(node->left->item->first, item.first)) //(item > (node->left->item))
       {
         node->left = leftRotate(node->left);
         return rightRotate(node);
@@ -138,11 +150,11 @@ struct AVLTree
     }
     if (balanceFactor < -1)
     {
-      if (_comp(node->right->item.first, item.first)) //(item > (node->right->item))
+      if (_comp(node->right->item->first, item.first)) //(item > (node->right->item))
       {
         return leftRotate(node);
       }
-      else if (_comp(item.first, node->right->item.first)) //(item < (node->right->item))
+      else if (_comp(item.first, node->right->item->first)) //(item < (node->right->item))
       {
         node->right = rightRotate(node->right);
         return leftRotate(node);
@@ -160,10 +172,10 @@ struct AVLTree
     if (node)
     {
 
-    Node *current = node;
-    while (current->left != NULL)
-      current = current->left;
-    return current;
+      Node *current = node;
+      while (current->left != NULL)
+        current = current->left;
+      return current;
     }
     return NULL;
   }
@@ -171,12 +183,12 @@ struct AVLTree
   {
     if (node)
     {
-
-    Node *current = node;
-    while (current->right != NULL)
-      current = current->right;
-    current->right = NULL;
-    return current;
+      Node *current = node;
+      while (current->right != NULL)
+        current = current->right;
+      current->right = NULL;
+      current->left = NULL;
+      return current;
     }
 
     return NULL;
@@ -194,7 +206,7 @@ struct AVLTree
       return right;
     return searchNode(root->left, key);
   }
-  Node* removeAll(Node *root)
+  Node *removeAll(Node *root)
   {
     if (!root)
       return NULL;
@@ -215,9 +227,9 @@ struct AVLTree
     // Find the node to be deleted and remove it
     if (root == NULL)
       return NULL;
-    if (_comp(item, (root->item).first))
+    if (_comp(item, (root->item)->first))
       root->left = deleteNode(root->left, item);
-    else if (_comp((root->item).first, item))
+    else if (_comp((root->item)->first, item))
       root->right = deleteNode(root->right, item);
     else
     {
@@ -235,17 +247,15 @@ struct AVLTree
         }
         else
         {
-          _allocater.destroy(root);
           _allocater.construct(root, *temp);
           _allocater.deallocate(temp, sizeof(Node));
-          temp = NULL;
         }
       }
       else
       {
         Node *temp = nodeWithMimumValue(root->right);
-        root->item = temp->item;
-        root->right = deleteNode(root->right,  temp->item.first);
+        _allocater.construct(root->item, *temp->item);
+        root->right = deleteNode(root->right, temp->item->first);
       }
     }
     if (root == NULL)
@@ -278,12 +288,11 @@ struct AVLTree
         return leftRotate(root);
       }
     }
-    if (root->left)
-      root->left->parent = root;
-    if (root->right)
-      root->right->parent = root; 
+    // if (root->left)
+    //   root->left->parent = root;
+    // if (root->right)
+    //   root->right->parent = root;
     return root;
-
   }
 
   void printTree(Node *currPtr, std::string indent, bool last)
@@ -301,7 +310,7 @@ struct AVLTree
         std::cout << "L---- ";
         indent += "|  ";
       }
-      std::cout << (currPtr->item) << std::endl;
+      std::cout << *(currPtr->item) << std::endl;
       printTree(currPtr->left, indent, false);
       printTree(currPtr->right, indent, true);
     }
@@ -394,11 +403,11 @@ struct AVLTree
   {
     // Print the node's value along
     // with its parent value
-    std::cout << "Node: " << (root->item)
+    std::cout << "Node: " << *(root->item)
               << ", Parent Node: ";
 
     if (root->parent != NULL)
-      std::cout << (root->parent->item) << std::endl;
+      std::cout << *(root->parent->item) << std::endl;
     else
       std::cout << "NULL" << std::endl;
 

@@ -5,10 +5,6 @@
 // you should include your path to this files
 
 #include "Map.hpp"
-#include "node.hpp"
-#include "pair.hpp"
-#include "map_iterator.hpp"
-
 
 // #include "map-test-helper.hpp"
 #include <map>
@@ -2217,9 +2213,31 @@ void alarm_handler(int seg)
     std::cout << "\033[1;33mTLE\033[0m\n";
     kill(getpid(), SIGINT);
 }
-
+// Reset
+#define Color_Off "\e[0m"       // Text Reset
+// Bold
+#define BBlack "\e[1;30m"       // Black
+#define BRed "\e[1;31m"         // Red
+#define BGreen "\e[1;32m"       // Green
+#define BYellow "\e[1;33m"      // Yellow
+#define BBlue "\e[1;34m"        // Blue
+#define BPurple "\e[1;35m"      // Purple
+#define BCyan "\e[1;36m"        // Cyan
+#define BWhite "\e[1;37m"       // White
+// Background
+#define On_Black "\e[40m"       // Black
+#define On_Red "\e[41m"         // Red
+#define On_Green "\e[42m"       // Green
+#define On_Yellow "\e[43m"      // Yellow
+#define On_Blue "\e[44m"        // Blue
+#define On_Purple "\e[45m"      // Purple
+#define On_Cyan "\e[46m"        // Cyan
+#define On_White "\e[47m"       // White
 int main()
 {
+    std::cout << On_Cyan << BBlack << "\n*********************************\n" << Color_Off;
+    std::cout << On_Cyan << BBlack << "************** MAP **************\n" << Color_Off;
+    std::cout << On_Cyan << BBlack << "*********************************\n" << Color_Off;
     std::cout << LRED << "________________________________________________________________________________________________________" << std::endl;
     std::cout << LRED << "**** The test is taking so much time to test the all cases and the time complexity of each method ****" << std::endl;
     std::cout << LRED << "--------------------------------------------------------------------------------------------------------" << RESET << std::endl;
@@ -2270,105 +2288,5 @@ int main()
     std::cout << YELLOW << "Testing Non-Member Swap  ; " << RESET << std::endl;
     TEST_CASE(testNonMemberSwap);
     std::cout << std::endl;
-
-        // std::map<char, int> m;
-        // ft::map<char, int> ft_m;
-
-        // // insert some values:
-        // ft_m['a'] = 10;
-        // ft_m['b'] = 20;
-        // ft_m['c'] = 30;
-        // ft_m['d'] = 40;
-        // ft_m['e'] = 50;
-        // ft_m['f'] = 60;
-
-        // m['a'] = 10;
-        // m['b'] = 20;
-        // m['c'] = 30;
-        // m['d'] = 40;
-        // m['e'] = 50;
-        // m['f'] = 60;
-
-		// std::map<char, int>::iterator it;
-        // ft::map<char, int>::iterator ft_it;
-
-        // it = m.find('b');
-        // ft_it = ft_m.find('b');
-
-        // m.erase(it);       // erasing by iterator
-        // ft_m.erase(ft_it); // erasing by iterator
-
-
-        // int ret = m.erase('c');       // erasing by key
-        // int ft_ret = ft_m.erase('c'); // erasing by key
-
-		// std::cout << ret << " " << ft_ret << "\n";
-
-        // it = m.find('e');
-        // ft_it = ft_m.find('e');
-
-        // m.erase(it, m.end());          // erasing by range
-        // ft_m.erase(ft_it, ft_m.end()); // erasing by range
-
-        // // /* ---------- Testing some edge cases ---------- */
-
-        // std::map<int, std::string> m2;
-        // ft::map<int, std::string> ft_m2;
-
-        // for (size_t i = 0; i < 80; i++)
-        // {
-        //     m2.insert(std::make_pair(i, "string1"));
-        //     ft_m2.insert(ft::make_pair(i, "string1"));
-        // }
-
-        // std::map<int, std::string>::reverse_iterator it2 = m2.rbegin();
-        // ft::map<int, std::string>::reverse_iterator ft_it2 = ft_m2.rbegin();
-
-        // m2.erase(m2.begin());
-        // ft_m2.erase(ft_m2.begin());
-
-
-        // m2.erase(it2->first);
-        // ft_m2.erase(ft_it2->first);
-
-
-        // std::map<int, std::string> m3;
-        // ft::map<int, std::string> ft_m3;
-        // std::vector<int> vec;
-        // std::vector<int> ft_vec;
-        // std::random_device randDev;
-        // std::mt19937 generator(randDev());
-        // std::uniform_int_distribution<int> distr(0, 1e8);
-
-        // for (size_t i = 0; i < 100; i++)
-        // {
-        //     m3.insert(std::make_pair(i, "string1"));
-        //     ft_m3.insert(ft::make_pair(i, "string1"));
-        // }
-
-        // for (size_t i = 0; i < 100; ++i)
-        // {
-        //     int n = distr(generator);
-        //     int ret1 = m3.erase(n);
-        //     int ret2 = ft_m3.erase(n);
-
-        //     if (ret1 != ret2)
-        //     {
-        //         break;
-        //     }
-        // }
-
-        // if (!m3.empty())
-        // {
-        //     m3.erase(m3.begin(), m3.end());
-        //     m3.erase(m3.begin(), m3.end());
-        // }
-        // if (!ft_m3.empty())
-        // {
-        //     ft_m3.erase(ft_m3.begin(), ft_m3.end());
-        //     ft_m3.erase(ft_m3.begin(), ft_m3.end());
-        // }
-
-	
     return 0;
 }

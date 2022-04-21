@@ -15,10 +15,23 @@ public:
 private:
 
 	Node *_root;
+	Node *_copy;
+	Node *nodeWithMaxValue(Node *node) const
+  	{
+    	if (node)
+    	{
+      		Node *current = node;
+      		while (current->right != NULL)
+        		current = current->right;
+      		return current;
+   		 }
+    	return NULL;
+  	}
 
 public:
 	bd_iterator() : _root() {}
-	bd_iterator(Node *x) : _root(x) {}
+	bd_iterator(Node *x) : _root(x), _copy(NULL) {}
+	bd_iterator(Node *x, Node* l) : _root(x), _copy(l) {}
 
 	operator bd_iterator<const Node, const value> () const
 		{
@@ -26,7 +39,7 @@ public:
 		}
 	reference operator*() const
 	{
-		return _root->item;
+		return *_root->item;
 	}
 	pointer operator->() const { return &(operator*()); }
 	bd_iterator &operator++()
@@ -51,6 +64,7 @@ public:
 				p = p->parent;
 			}
 			_root = p;
+			
 		}
 		return *this;
 	}
@@ -63,6 +77,7 @@ public:
 
 	bd_iterator &operator--()
 	{
+		if(_root != NULL)
 		{
 			Node *p;
 
@@ -86,6 +101,8 @@ public:
 				_root = p;
 			}
 		}
+		else
+			_root = nodeWithMaxValue(_copy);
 		return *this;
 	}
 
@@ -106,24 +123,6 @@ public:
 	{
 		return (_root == it._root);
 	}
-	template <typename S, typename V>
-	bool operator>(const bd_iterator<S, V> &it) const
-	{
-		return (_root > it._root);
-	}
-	template <typename S, typename V>
-	bool operator<(const bd_iterator<S, V> &it) const
-	{
-		return (_root < it._root);
-	}
-	template <typename S, typename V>
-	bool operator<=(const bd_iterator<S, V> &it) const
-	{
-		return (_root <= it._root);
-	}
-	template <typename S, typename V>
-	bool operator>=(const bd_iterator<S, V> &it) const
-	{
-		return (_root >= it._root);
-	}
+
+
 };

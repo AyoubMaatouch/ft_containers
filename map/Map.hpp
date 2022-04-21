@@ -28,8 +28,8 @@ namespace ft
     typedef ptrdiff_t difference_type;
     typedef typename Allocator::pointer pointer;
     typedef typename Allocator::const_pointer const_pointer;
-    typedef bd_iterator <Node<pair<Key, T>, Allocator>, pair<Key, T> > iterator;
-    typedef bd_iterator <Node<pair<Key, T>, Allocator>, pair<Key, T> > const_iterator;
+    typedef bd_iterator <Node<value_type , Allocator>, value_type> iterator;
+    typedef bd_iterator <Node<value_type , Allocator>, value_type> const_iterator;
     typedef ::ft::reverse_iterator<iterator> reverse_iterator;
     typedef ::ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -88,14 +88,14 @@ namespace ft
     }
     iterator end()
     {
-      // if (_tree.root)
-        return iterator((_tree.nodeWithMaxValue(_tree.root)));
-      // return iterator((_tree.nodeWithMaxValue(_tree.root)));
-    }
+      if (_tree.root)
+          return iterator(NULL,_tree.root);
+      return iterator((_tree.nodeWithMaxValue(_tree.root)));
+        }
     const_iterator end() const
     {
-      // if (_tree.root)
-        // return const_iterator((_tree.nodeWithMaxValue(_tree.root))->right);
+       if (_tree.root)
+          return const_iterator(NULL,_tree.root);
       return const_iterator((_tree.nodeWithMaxValue(_tree.root)));
     }
     reverse_iterator rbegin()
@@ -117,7 +117,7 @@ namespace ft
     // capacity:
     bool empty() const { return !(size() > 0); }
     size_type size() const { return _size; }
-    size_type max_size() const { _allocator.max_size(); }
+    size_type max_size() const { return _allocator.max_size(); }
     // element access:
     T &operator[](const key_type &x)
     {
@@ -126,10 +126,12 @@ namespace ft
     // modifiers:
     ft::pair<iterator, bool> insert(const value_type &x)
     {
-      if (!_size || find(x.first) == end())
+      iterator en = end();
+      if (!_size || find(x.first) == en)
       {
         _size++;
         _tree.root = _tree.insertNode(_tree.root, NULL, x);
+        
         return (ft::make_pair(find(x.first), true));
       }
       return (ft::make_pair(find(x.first), false));
@@ -225,46 +227,47 @@ namespace ft
     iterator lower_bound(const key_type &x)
     {
       iterator it = begin();
-      while (it != end())
-      {
-        if (!comp(it->first, x))
-          return it;
-        ++it;
-      }
-      return (end());
+			while (it != end())
+			{
+				if (comp(it->first, x) == false)
+					break ;
+				++it;
+			}
+			return (it);
     }
     const_iterator lower_bound(const key_type &x) const
     {
       const_iterator it = begin();
-      while (it != end())
-      {
-        if (!comp(it->first, x))
-          return it;
-        ++it;
+			while (it != end())
+			{
+				if (comp(it->first, x) == false)
+					break ;
+				++it;
+			}
+			return (it);
       }
-      return (end());
-    }
+  
     iterator upper_bound(const key_type &x)
     {
       iterator it = begin();
-      while (it != end())
-      {
-        if (comp(it->first, x))
-          return it;
-        ++it;
-      }
-      return (end());
+			while (it != end())
+			{
+				if (comp(x, it->first) == true)
+					break ;
+				++it;
+			}
+			return (it);
     }
     const_iterator upper_bound(const key_type &x) const
     {
       const_iterator it = begin();
-      while (it != end())
-      {
-        if (comp(it->first, x))
-          return it;
-        ++it;
-      }
-      return (end());
+			while (it != end())
+			{
+				if (comp(x, it->first) == true)
+					break ;
+				++it;
+			}
+			return (it);;
     }
     pair<iterator, iterator> equal_range(const key_type &x)
     {
@@ -280,7 +283,7 @@ namespace ft
     }
 
   private:
-    AVLTree<pair<Key, T>, Compare, allocator_type> _tree;
+    AVLTree<value_type, Compare, allocator_type> _tree;
     size_type _size;
     allocator_type _allocator;
     key_compare comp;

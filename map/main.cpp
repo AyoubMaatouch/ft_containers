@@ -38,13 +38,7 @@ struct Buffer
 
 
 #define COUNT (MAX_RAM / (int)sizeof(Buffer))
-// int main()
-// {
-//   int *x = NULL;
-//   int *y =  new int(10);
 
-//   std::cout << (x ? *x : 0) << " "<<*y <<std::endl;
-// }
 template <typename Iter1, typename Iter2>
 bool comparemaps(Iter1 first1, Iter1 last1, Iter2 first2, Iter2 last2)
 {
@@ -71,42 +65,16 @@ long get_time()
 // }
 
 int main() {
-  std::map<char,int> mymap;
+ft::map<char,int> mymap;
 
-  mymap['x'] = 100;
-  mymap['y'] = 200;
-  mymap['z'] = 300;
+  mymap['b'] = 100;
+  mymap['a'] = 200;
+  mymap['c'] = 300;
 
   // show content:
-  std::map<char,int>::iterator rit =  mymap.begin();
-  std::map<char,int>::iterator eit =  mymap.end();
-//   for (; rit!= eit; rit++)
-    std::cout << eit->first << " => \n";
-    eit--;
-    std::cout << eit->first << " => \n";
-    eit--;
-    std::cout << eit->first << " => \n";
-// std::cout << rit->first << " => " << rit->second << '\n';
+  for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
+    std::cout << it->first << " => " << it->second << '\n';
 
   return 0;
-//  ft::map<char,int> mymap;
-
-//   mymap['x']=100;
-//   mymap['y']=200;
-//   mymap['z']=300;
-
-//   std::cout << "mymap contains:\n";
-//   for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
-//     std::cout << it->first << " => " << it->second << '\n';
-
-//   mymap.clear();
-//   mymap['a']=1101;
-//   mymap['b']=2202;
-
-//   std::cout << "mymap contains:\n";
-//   for (ft::map<char,int>::iterator it=mymap.begin(); it!=mymap.end(); ++it)
-//     std::cout << it->first << " => " << it->second << '\n';
-    
-//   return 0;
       
 } 
