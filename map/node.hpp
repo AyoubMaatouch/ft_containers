@@ -8,6 +8,7 @@
 #include <iostream>
 #include <memory>
 #include "pair.hpp"
+#define print(X) std::cout << X << std::endl;
 // Create node
 template <class T, class Alloc>
 struct Node
@@ -194,20 +195,25 @@ struct AVLTree
     return NULL;
   }
   // search Node
-  Node *searchNode(Node *root, key_type key)
+  Node *searchNode(Node *root, key_type key) const
   {
+    // print("still")
+    
     if (!root)
       return NULL;
-    if (root->item.first == key)
+    if (root->item->first == key)
       return root;
-
+  
     Node *right = (searchNode(root->right, key));
     if (right)
       return right;
-    return searchNode(root->left, key);
+    Node *left = searchNode(root->left, key);
+      return left;
+    return NULL;
   }
   Node *removeAll(Node *root)
   {
+
     if (!root)
       return NULL;
     removeAll(root->right);
@@ -248,7 +254,7 @@ struct AVLTree
         else
         {
           _allocater.construct(root, *temp);
-          _allocater.deallocate(temp, sizeof(Node));
+          // _allocater.deallocate(temp, sizeof(Node));
         }
       }
       else
@@ -288,10 +294,10 @@ struct AVLTree
         return leftRotate(root);
       }
     }
-    // if (root->left)
-    //   root->left->parent = root;
-    // if (root->right)
-    //   root->right->parent = root;
+    if (root->left)
+      root->left->parent = root;
+    if (root->right)
+      root->right->parent = root;
     return root;
   }
 

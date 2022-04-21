@@ -4,6 +4,7 @@
 #include <iostream>
 #include "../vector/iterators.hpp"
 #include "node.hpp"
+#define print(X) std::cout << X << std::endl;
 
 namespace ft
 {
@@ -55,12 +56,7 @@ namespace ft
     map(InputIterator first, InputIterator last,
         const Compare &comp = Compare(), const Allocator & = Allocator()) : _tree(), _size(0)
     {
-      for (; first != last; first++)
-      {
-        _tree.root = _tree.insertNode(_tree.root, NULL, (*first));
-        _size++;
-      }
-      // insert(x.begin(), x.end());
+      insert(first, last);
     }
 
     map(const map<Key, T, Compare, Allocator> &x) : _tree(), _size(), _allocator()
@@ -80,23 +76,19 @@ namespace ft
 
     iterator begin()
     {
-      return iterator(_tree.nodeWithMimumValue(_tree.root));
+      return iterator(_tree.nodeWithMimumValue(_tree.root), _tree.root);
     }
     const_iterator begin() const
     {
-      return const_iterator(_tree.nodeWithMimumValue(_tree.root));
+      return const_iterator(_tree.nodeWithMimumValue(_tree.root), _tree.root);
     }
     iterator end()
     {
-      if (_tree.root)
           return iterator(NULL,_tree.root);
-      return iterator((_tree.nodeWithMaxValue(_tree.root)));
         }
     const_iterator end() const
     {
-       if (_tree.root)
           return const_iterator(NULL,_tree.root);
-      return const_iterator((_tree.nodeWithMaxValue(_tree.root)));
     }
     reverse_iterator rbegin()
     {
@@ -131,7 +123,6 @@ namespace ft
       {
         _size++;
         _tree.root = _tree.insertNode(_tree.root, NULL, x);
-        
         return (ft::make_pair(find(x.first), true));
       }
       return (ft::make_pair(find(x.first), false));
@@ -179,7 +170,11 @@ namespace ft
     }
     void swap(map<Key, T, Compare, Allocator> &x)
     {
-      ft::swap(*this, x);
+      ft::swap(x._size, this->_size);
+      ft::swap(x._allocator, this->_allocator);
+      ft::swap(x._tree, this->_tree);
+      ft::swap(x.comp, this->comp);
+
     }
     void clear()
     {
@@ -194,29 +189,16 @@ namespace ft
     {
       return (value_compare(key_comp()));
     }
-    // key_compare key_comp() const { return key_compare(value_compare(comp)); }
-    // value_compare value_comp() const { return comp; }
+
     iterator find(const key_type &x)
     {
-      iterator be = begin();
-      iterator ed = end();
-      for (; be != ed; be++)
-      {
-        if (be->first == x)
-          return (be);
-      }
-      return ed;
+      iterator be = iterator(_tree.searchNode(_tree.root, x), _tree.root);
+      return be;
     }
     const_iterator find(const key_type &x) const
     {
-      const_iterator be = begin();
-      const_iterator ed = end();
-      for (; be != ed; be++)
-      {
-        if (be->first == x)
-          return (be);
-      }
-      return ed;
+      const_iterator  be = const_iterator(_tree.searchNode(_tree.root, x), _tree.root);
+      return be;
     }
     size_type count(const key_type &x) const
     {
@@ -227,7 +209,8 @@ namespace ft
     iterator lower_bound(const key_type &x)
     {
       iterator it = begin();
-			while (it != end())
+      iterator bg = end();
+			while (it != bg)
 			{
 				if (comp(it->first, x) == false)
 					break ;
@@ -238,7 +221,8 @@ namespace ft
     const_iterator lower_bound(const key_type &x) const
     {
       const_iterator it = begin();
-			while (it != end())
+      const_iterator bg = end();
+			while (it != bg)
 			{
 				if (comp(it->first, x) == false)
 					break ;
@@ -250,7 +234,8 @@ namespace ft
     iterator upper_bound(const key_type &x)
     {
       iterator it = begin();
-			while (it != end())
+      iterator bg = end();
+			while (it != bg)
 			{
 				if (comp(x, it->first) == true)
 					break ;
@@ -261,7 +246,8 @@ namespace ft
     const_iterator upper_bound(const key_type &x) const
     {
       const_iterator it = begin();
-			while (it != end())
+      const_iterator bg = end();
+			while (it != bg)
 			{
 				if (comp(x, it->first) == true)
 					break ;
@@ -287,7 +273,6 @@ namespace ft
     size_type _size;
     allocator_type _allocator;
     key_compare comp;
-    // value_compare   _vcompare;
   };
 
   // template <class Key, class T, class Compare, class Alloc>

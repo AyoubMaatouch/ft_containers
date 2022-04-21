@@ -27,6 +27,17 @@ private:
    		 }
     	return NULL;
   	}
+	Node *nodeWithMimumValue(Node *node) const
+  	{
+    	if (node)
+    	{
+      		Node *current = node;
+      		while (current->left != NULL)
+      		  current = current->left;
+      		return current;
+		}
+    return NULL;
+  	}
 
 public:
 	bd_iterator() : _root() {}
@@ -41,11 +52,21 @@ public:
 	{
 		return *_root->item;
 	}
+	pointer base()
+		{
+			return (_root->item);
+		}
 	pointer operator->() const { return &(operator*()); }
 	bd_iterator &operator++()
 	{
+		// Node* tmp = ;
+		if (_root == nodeWithMaxValue(_copy)) //* Last Node protection
+		{
+			_root = NULL;
+			return (*this);
+		}
 
-		Node *p;
+
 		if (_root->right != NULL)
 		{
 			_root = _root->right;
@@ -57,7 +78,7 @@ public:
 		}
 		else
 		{
-			p = _root->parent;
+			Node *p = _root->parent;
 			while (p != NULL && _root == p->right)
 			{
 				_root = p;
@@ -79,6 +100,13 @@ public:
 	{
 		if(_root != NULL)
 		{
+			Node* tmp = nodeWithMimumValue(_copy);
+			if (_root == tmp) //* first Node protection
+			{
+				_root = NULL;
+				_copy = NULL;
+				return (*this);
+			}
 			Node *p;
 
 			if (_root->left != NULL)

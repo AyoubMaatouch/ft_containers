@@ -9,8 +9,6 @@ namespace ft
     template <class T>
     struct less
     {
-
-        // Declaration of the less operation
         bool operator()(const T &x,
                         const T &y)
             const
