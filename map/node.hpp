@@ -1,15 +1,15 @@
-// TO_DO
 /***
- *
- * remember to remove .first when you implement the map
- *
+ * AVL tree sources :
+ * https://www.programiz.com/dsa/avl-tree
+ * https://www.cs.odu.edu/~zeil/cs361/latest/Public/treetraversal/index.html
  * */
 #pragma once
 #include <iostream>
 #include <memory>
 #include "pair.hpp"
 #define print(X) std::cout << X << std::endl;
-// Create node
+
+//  node
 template <class T, class Alloc>
 struct Node
 {
@@ -27,27 +27,17 @@ struct Node
   }
 
   Node() : height(0), left(NULL), parent(NULL), right(NULL) {}
-
-  // Node(Node const & x) :height(x.height), left(x.left), parent(x.parent), right(x.right) {
-  //   item = _alloc.allocate(sizeof(T));
-  //   _alloc.construct(item, x->item);
-  // }
-  ~Node()
-  {
-    // if (item)
-    //   _allocator.deallocate(item, sizeof(T));
-  }
+  ~Node() {}
 };
 
 // Tree class
-template <class T, class Compare, class Alloc> // class Alloc
+template <class T, class Compare, class Alloc> 
 struct AVLTree
 {
   typedef T value_type;
   typedef Compare comp;
   typedef typename value_type::first_type key_type;
   typedef typename value_type::second_type mapped_type;
-  // typedef std::allocator<T> Alloc;
   typedef Node<value_type, Alloc> Node;
   typedef typename Alloc::template rebind<Node>::other alloc_type;
   Node *root;
@@ -254,7 +244,6 @@ struct AVLTree
         else
         {
           _allocater.construct(root, *temp);
-          // _allocater.deallocate(temp, sizeof(Node));
         }
       }
       else
