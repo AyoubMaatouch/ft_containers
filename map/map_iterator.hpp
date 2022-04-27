@@ -44,10 +44,6 @@ public:
 	bd_iterator(Node *x) : _root(x), _copy(NULL) {}
 	bd_iterator(Node *x, Node* l) : _root(x), _copy(l) {}
 
-	operator bd_iterator<const Node, const value> () const
-		{
-			return bd_iterator<const Node, const value> (_root);
-		}
 	reference operator*() const
 	{
 		return *_root->item;
